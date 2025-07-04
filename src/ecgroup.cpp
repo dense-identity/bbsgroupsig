@@ -9,12 +9,32 @@ namespace ecgroup {
     // --- Scalar Implementation ---
     Scalar::Scalar() {}
     void Scalar::set_random() { value.setRand(); }
+    
+    Scalar Scalar::inverse() const {
+        Scalar inv;
+        mcl::bn::Fr::inv(inv.value, this->value);
+        return inv;
+    }
+
+    Scalar Scalar::hash_to_scalar(const std::string& message) {
+        Scalar s;
+        s.value.setHashOf(message);
+        return s;
+    }
+
     bool Scalar::operator==(const Scalar& other) const { return value == other.value; }
     const mcl::bn::Fr& Scalar::get_underlying() const { return value; }
     mcl::bn::Fr& Scalar::get_underlying() { return value; }
 
     // --- G1Point Implementation ---
     G1Point::G1Point() {}
+
+    G1Point G1Point::get_random() {
+        Scalar s;
+        s.set_random();
+        G1Point g1_generator = G1Point::hash_and_map_to("ecgroup_g1_generator");
+        return G1Point::mul(g1_generator, s);
+    }
 
     G1Point G1Point::hash_and_map_to(const std::string& message) {
         G1Point p;
@@ -39,6 +59,13 @@ namespace ecgroup {
 
     // --- G2Point Implementation ---
     G2Point::G2Point() {}
+
+    G2Point G2Point::get_random() {
+        Scalar s;
+        s.set_random();
+        G2Point g2_generator = G2Point::get_generator();
+        return G2Point::mul(g2_generator, s);
+    }
 
     G2Point G2Point::get_generator() {
         G2Point g;

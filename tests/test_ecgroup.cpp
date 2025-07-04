@@ -1,7 +1,11 @@
+// This tells Catch2 to provide a main() function.
+// Only do this in one .cpp file in your test project.
+// #define CATCH_CONFIG_MAIN // This should be in a separate test_main.cpp
 #include <catch2/catch_test_macros.hpp>
 
-#include "ecgroup.hpp"
+#include "ecgroup.hpp" // The header for the library we are testing
 
+// A single test case with sections for better organization.
 TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
     // Initialize the pairing library once for all tests in this case.
     ecgroup::init_pairing();
@@ -15,8 +19,19 @@ TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
         REQUIRE(s1 == s1);
 
         // Two different random scalars should not be equal.
-        // (The probability of a collision is negligible).
         REQUIRE_FALSE(s1 == s2);
+
+        // Test scalar inversion
+        ecgroup::Scalar s_inv = s1.inverse();
+        ecgroup::Scalar s_inv_inv = s_inv.inverse();
+        REQUIRE(s1 == s_inv_inv); // s == (s^-1)^-1
+
+        // Test hashing to scalar
+        ecgroup::Scalar h1 = ecgroup::Scalar::hash_to_scalar("test message");
+        ecgroup::Scalar h2 = ecgroup::Scalar::hash_to_scalar("test message");
+        ecgroup::Scalar h3 = ecgroup::Scalar::hash_to_scalar("another message");
+        REQUIRE(h1 == h2);
+        REQUIRE_FALSE(h1 == h3);
     }
 
     SECTION("G1Point operations") {
@@ -37,7 +52,14 @@ TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
         ecgroup::Scalar s;
         s.set_random();
         ecgroup::G1Point p_mul = ecgroup::G1Point::mul(p1, s);
-        REQUIRE_FALSE(p_mul == p1); // Unless s is 1, which is astronomically unlikely.
+        REQUIRE_FALSE(p_mul == p1);
+
+        // Test random point generation
+        ecgroup::G1Point r1 = ecgroup::G1Point::get_random();
+        ecgroup::G1Point r2 = ecgroup::G1Point::get_random();
+        ecgroup::G1Point identity; // Default constructor is identity
+        REQUIRE_FALSE(r1 == r2);
+        REQUIRE_FALSE(r1 == identity);
     }
 
     SECTION("G2Point operations") {
@@ -59,6 +81,13 @@ TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
         ecgroup::G2Point p_sum = p1.add(p2);
         REQUIRE_FALSE(p_sum == p1);
         REQUIRE_FALSE(p_sum == p2);
+
+        // Test random point generation
+        ecgroup::G2Point r1 = ecgroup::G2Point::get_random();
+        ecgroup::G2Point r2 = ecgroup::G2Point::get_random();
+        ecgroup::G2Point identity; // Default constructor is identity
+        REQUIRE_FALSE(r1 == r2);
+        REQUIRE_FALSE(r1 == identity);
     }
 
     SECTION("Pairing properties") {
