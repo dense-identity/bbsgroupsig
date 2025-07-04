@@ -1,0 +1,91 @@
+#include <catch2/catch_test_macros.hpp>
+
+#include "ecgroup.hpp"
+
+TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
+    // Initialize the pairing library once for all tests in this case.
+    ecgroup::init_pairing();
+
+    SECTION("Scalar operations") {
+        ecgroup::Scalar s1, s2;
+        s1.set_random();
+        s2.set_random();
+
+        // A scalar must be equal to itself.
+        REQUIRE(s1 == s1);
+
+        // Two different random scalars should not be equal.
+        // (The probability of a collision is negligible).
+        REQUIRE_FALSE(s1 == s2);
+    }
+
+    SECTION("G1Point operations") {
+        ecgroup::G1Point p1 = ecgroup::G1Point::hash_and_map_to("hello world");
+        ecgroup::G1Point p2 = ecgroup::G1Point::hash_and_map_to("another message");
+        ecgroup::G1Point p1_copy = ecgroup::G1Point::hash_and_map_to("hello world");
+
+        // Hashing the same message should produce the same point.
+        REQUIRE(p1 == p1_copy);
+        REQUIRE_FALSE(p1 == p2);
+
+        // Test addition
+        ecgroup::G1Point p_sum = p1.add(p2);
+        REQUIRE_FALSE(p_sum == p1);
+        REQUIRE_FALSE(p_sum == p2);
+
+        // Test scalar multiplication
+        ecgroup::Scalar s;
+        s.set_random();
+        ecgroup::G1Point p_mul = ecgroup::G1Point::mul(p1, s);
+        REQUIRE_FALSE(p_mul == p1); // Unless s is 1, which is astronomically unlikely.
+    }
+
+    SECTION("G2Point operations") {
+        ecgroup::G2Point g = ecgroup::G2Point::get_generator();
+        ecgroup::G2Point g_copy = ecgroup::G2Point::get_generator();
+
+        // The generator should be deterministic.
+        REQUIRE(g == g_copy);
+
+        ecgroup::Scalar s1, s2;
+        s1.set_random();
+        s2.set_random();
+
+        ecgroup::G2Point p1 = ecgroup::G2Point::mul(g, s1);
+        ecgroup::G2Point p2 = ecgroup::G2Point::mul(g, s2);
+        REQUIRE_FALSE(p1 == p2);
+
+        // Test addition
+        ecgroup::G2Point p_sum = p1.add(p2);
+        REQUIRE_FALSE(p_sum == p1);
+        REQUIRE_FALSE(p_sum == p2);
+    }
+
+    SECTION("Pairing properties") {
+        // Test the fundamental bilinear property: e(a*P, Q) == e(P, a*Q)
+        ecgroup::Scalar s;
+        s.set_random();
+
+        ecgroup::G1Point p = ecgroup::G1Point::hash_and_map_to("test point");
+        ecgroup::G2Point q = ecgroup::G2Point::get_generator();
+
+        // Calculate a*P in G1
+        ecgroup::G1Point p_mul_s = ecgroup::G1Point::mul(p, s);
+
+        // Calculate a*Q in G2
+        ecgroup::G2Point q_mul_s = ecgroup::G2Point::mul(q, s);
+
+        // Calculate e(a*P, Q)
+        ecgroup::PairingResult e1 = ecgroup::pairing(p_mul_s, q);
+
+        // Calculate e(P, a*Q)
+        ecgroup::PairingResult e2 = ecgroup::pairing(p, q_mul_s);
+
+        // The results must be equal.
+        REQUIRE(e1 == e2);
+
+        // Also check that the pairing result is not trivial (not equal to a different pairing).
+        ecgroup::PairingResult e_trivial = ecgroup::pairing(p, q);
+        REQUIRE_FALSE(e1 == e_trivial);
+    }
+}

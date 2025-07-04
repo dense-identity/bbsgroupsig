@@ -12,9 +12,9 @@ FetchContent_MakeAvailable(Catch2)
 # -----------------------------
 # Test Executable Definition (using Catch2)
 # -----------------------------
-file(GLOB TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-add_executable(run_bbsgs_tests ${TEST_SRC})
-target_include_directories(run_bbsgs_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+file(GLOB TEST_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+add_executable(run_bbsgs_tests ${TEST_SRC_FILES})
+target_include_directories(run_bbsgs_tests PRIVATE "${PROJECT_SOURCE_DIR}/src")
 
 # -----------------------------------------------------------------------------
 # Link Libraries
