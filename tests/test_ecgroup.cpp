@@ -117,4 +117,34 @@ TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
         ecgroup::PairingResult e_trivial = ecgroup::pairing(p, q);
         REQUIRE_FALSE(e1 == e_trivial);
     }
+
+    SECTION("Serialization") {
+        // Test round-trip serialization for Scalar
+        ecgroup::Scalar s1;
+        s1.set_random();
+        std::string s1_str = s1.to_string();
+        ecgroup::Bytes s1_bytes = s1.to_bytes();
+        ecgroup::Scalar s1_from_str = ecgroup::Scalar::from_string(s1_str);
+        ecgroup::Scalar s1_from_bytes = ecgroup::Scalar::from_bytes(s1_bytes);
+        REQUIRE(s1 == s1_from_str);
+        REQUIRE(s1 == s1_from_bytes);
+
+        // Test round-trip serialization for G1Point
+        ecgroup::G1Point p1 = ecgroup::G1Point::get_random();
+        std::string p1_str = p1.to_string();
+        ecgroup::Bytes p1_bytes = p1.to_bytes();
+        ecgroup::G1Point p1_from_str = ecgroup::G1Point::from_string(p1_str);
+        ecgroup::G1Point p1_from_bytes = ecgroup::G1Point::from_bytes(p1_bytes);
+        REQUIRE(p1 == p1_from_str);
+        REQUIRE(p1 == p1_from_bytes);
+
+        // Test round-trip serialization for G2Point
+        ecgroup::G2Point p2 = ecgroup::G2Point::get_random();
+        std::string p2_str = p2.to_string();
+        ecgroup::Bytes p2_bytes = p2.to_bytes();
+        ecgroup::G2Point p2_from_str = ecgroup::G2Point::from_string(p2_str);
+        ecgroup::G2Point p2_from_bytes = ecgroup::G2Point::from_bytes(p2_bytes);
+        REQUIRE(p2 == p2_from_str);
+        REQUIRE(p2 == p2_from_bytes);
+    }
 }
