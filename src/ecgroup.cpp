@@ -127,6 +127,11 @@ namespace ecgroup {
         mcl::bn::G1::add(result.value, this->value, other.value);
         return result;
     }
+    G1Point G1Point::negate() const {
+        G1Point result;
+        mcl::bn::G1::neg(result.value, this->value);
+        return result;
+    }
     bool G1Point::operator==(const G1Point& other) const { return value == other.value; }
     const mcl::bn::G1& G1Point::get_underlying() const { return value; }
 

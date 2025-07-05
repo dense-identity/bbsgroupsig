@@ -68,6 +68,7 @@ namespace ecgroup {
         static G1Point from_string(const std::string& s);
         static G1Point from_bytes(const Bytes& b);
         G1Point add(const G1Point& other) const;
+        G1Point negate() const;
 
         bool operator==(const G1Point& other) const;
 

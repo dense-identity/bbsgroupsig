@@ -12,53 +12,104 @@ namespace bbsgs {
         // Compute T1, T2, T3
         sigma.T1 = ecgroup::G1Point::mul(gpk.u, alpha);
         sigma.T2 = ecgroup::G1Point::mul(gpk.v, beta);
-        sigma.T3 = usk.A.add(ecgroup::G1Point::mul(gpk.h, ecgroup::Scalar::add(alpha, beta)));
+        sigma.T3 = usk.A.add(ecgroup::G1Point::mul(gpk.h, alpha + beta));
 
-        // Sample r_values
+        // Sample r_values (nonces for the ZKP)
         ecgroup::Scalar r_alpha = ecgroup::Scalar::get_random();
         ecgroup::Scalar r_beta = ecgroup::Scalar::get_random();
         ecgroup::Scalar r_x = ecgroup::Scalar::get_random();
         ecgroup::Scalar r_delta_1 = ecgroup::Scalar::get_random();
         ecgroup::Scalar r_delta_2 = ecgroup::Scalar::get_random();
 
-
+        // Compute R values (commitments for the ZKP)
         ecgroup::G1Point R1 = ecgroup::G1Point::mul(gpk.u, r_alpha);
         ecgroup::G1Point R2 = ecgroup::G1Point::mul(gpk.v, r_beta);
         ecgroup::PairingResult R3 = ecgroup::pairing(sigma.T3, gpk.g2).pow(r_x) 
-                                    * ecgroup::pairing(gpk.h, gpk.w).pow(ecgroup::Scalar::add(r_alpha.negate(), r_beta.negate()))
-                                    * ecgroup::pairing(gpk.h, gpk.g2).pow(ecgroup::Scalar::add(r_delta_1.negate(), r_delta_2.negate()));
+                                    * ecgroup::pairing(gpk.h, gpk.w).pow((r_alpha + r_beta).negate())
+                                    * ecgroup::pairing(gpk.h, gpk.g2).pow((r_delta_1 + r_delta_2).negate());
                                     
         ecgroup::G1Point R4 = ecgroup::G1Point::mul(sigma.T1, r_x).add(ecgroup::G1Point::mul(gpk.u, r_delta_1.negate()));
         ecgroup::G1Point R5 = ecgroup::G1Point::mul(sigma.T2, r_x).add(ecgroup::G1Point::mul(gpk.v, r_delta_2.negate()));
 
+        // Create challenge and responses
         sigma.c = hash_all_to_scalar(message, sigma.T1, sigma.T2, sigma.T3, R1, R2, R3, R4, R5);
-        sigma.s_alpha = r_alpha + (sigma.c * alpha);
-        sigma.s_beta = r_beta + (sigma.c * beta);
-        sigma.s_x = r_x + (sigma.c * usk.x);
-        sigma.s_delta_1 = r_delta_1 + (sigma.c * (usk.x * alpha));
-        sigma.s_delta_2 = r_delta_2 + (sigma.c * (usk.x * beta));
+        sigma.s_alpha = r_alpha + sigma.c * alpha;
+        sigma.s_beta = r_beta + sigma.c * beta;
+        sigma.s_x = r_x + sigma.c * usk.x;
+        sigma.s_delta_1 = r_delta_1 + sigma.c * (usk.x * alpha);
+        sigma.s_delta_2 = r_delta_2 + sigma.c * (usk.x * beta);
 
         return sigma;
     };
 
-    // bool verify(GroupPublicKey const &gpk, ecgroup::Bytes const &message, GroupSignature const &sigma) {};
+    bool bbs04_verify(GroupPublicKey const &gpk, ecgroup::Bytes const &message, GroupSignature const &sigma) {
+        // Recompute the R commitments using the s-values from the signature
+        // R'_1 = u^s_alpha * T1^-c
+        ecgroup::G1Point R1_prime = ecgroup::G1Point::mul(gpk.u, sigma.s_alpha)
+                                    .add(ecgroup::G1Point::mul(sigma.T1, sigma.c.negate()));
 
-    // ecgroup::G1Point open(GroupPublicKey const &gpk, OpenerSecretKey const &osk, ecgroup::Bytes const &message, GroupSignature const &sigma) {};
+        // R'_2 = v^s_beta * T2^-c
+        ecgroup::G1Point R2_prime = ecgroup::G1Point::mul(gpk.v, sigma.s_beta)
+                                    .add(ecgroup::G1Point::mul(sigma.T2, sigma.c.negate()));
+
+        // R'_4 = T1^s_x * u^-s_delta_1
+        ecgroup::G1Point R4_prime = ecgroup::G1Point::mul(sigma.T1, sigma.s_x)
+                                    .add(ecgroup::G1Point::mul(gpk.u, sigma.s_delta_1.negate()));
+        
+        // R'_5 = T2^s_x * v^-s_delta_2
+        ecgroup::G1Point R5_prime = ecgroup::G1Point::mul(sigma.T2, sigma.s_x)
+                                    .add(ecgroup::G1Point::mul(gpk.v, sigma.s_delta_2.negate()));
+        
+        // R'_3 = e(T3,g2)^s_x * e(h,w)^-(s_alpha+s_beta) * e(h,g2)^-(s_delta1+s_delta2) * [e(T3,w)/e(g1,g2)]^c
+        ecgroup::Scalar s_ab_neg = (sigma.s_alpha + sigma.s_beta).negate();
+        ecgroup::Scalar s_d_neg = (sigma.s_delta_1 + sigma.s_delta_2).negate();
+
+        ecgroup::PairingResult term1 = ecgroup::pairing(sigma.T3, gpk.g2).pow(sigma.s_x);
+        ecgroup::PairingResult term2 = ecgroup::pairing(gpk.h, gpk.w).pow(s_ab_neg);
+        ecgroup::PairingResult term3 = ecgroup::pairing(gpk.h, gpk.g2).pow(s_d_neg);
+        ecgroup::PairingResult term4_base = ecgroup::pairing(sigma.T3, gpk.w) / ecgroup::pairing(gpk.g1, gpk.g2);
+        ecgroup::PairingResult term4 = term4_base.pow(sigma.c);
+
+        ecgroup::PairingResult R3_prime = term1 * term2 * term3 * term4;
+        
+        // Hash the recomputed R values to get the challenge
+        ecgroup::Scalar c_prime = hash_all_to_scalar(
+            message, sigma.T1, sigma.T2, sigma.T3,
+            R1_prime, R2_prime, R3_prime, R4_prime, R5_prime
+        );
+
+        // The signature is valid if the recomputed challenge matches the original one
+        return c_prime == sigma.c;
+    };
+
+    ecgroup::G1Point bbs04_open(const GroupPublicKey& gpk, const OpenerSecretKey& osk, const GroupSignature& sigma) {
+        // Calculate T1^xi1
+        ecgroup::G1Point t1_pow_xi1 = ecgroup::G1Point::mul(sigma.T1, osk.xi1);
+
+        // Calculate T2^xi2
+        ecgroup::G1Point t2_pow_xi2 = ecgroup::G1Point::mul(sigma.T2, osk.xi2);
+        
+        // Calculate h^(a+b) = (T1^xi1) * (T2^xi2)
+        ecgroup::G1Point h_pow_ab = t1_pow_xi1.add(t2_pow_xi2);
+        
+        // Recover A = T3 * (h^(a+b))^-1, which is T3 + (-h^(a+b))
+        return sigma.T3.add(h_pow_ab.negate());
+    }
 
     Scalar hash_all_to_scalar(
-        const Bytes& message,
-        const G1Point& T1, const G1Point& T2, const G1Point& T3,
-        const G1Point& R1, const G1Point& R2, const PairingResult& R3,
-        const G1Point& R4, const G1Point& R5) 
+        const ecgroup::Bytes& message,
+        const ecgroup::G1Point& T1, const ecgroup::G1Point& T2, const ecgroup::G1Point& T3,
+        const ecgroup::G1Point& R1, const ecgroup::G1Point& R2, const ecgroup::PairingResult& R3,
+        const ecgroup::G1Point& R4, const ecgroup::G1Point& R5) 
     {
         const size_t total_size = message.size() +
-                                  (7 * G1_SERIALIZED_SIZE) + // T1,T2,T3,R1,R2,R4,R5 are G1
-                                  GT_SERIALIZED_SIZE;        // R3 is Gt
+                                  (7 * ecgroup::G1_SERIALIZED_SIZE) +
+                                  ecgroup::GT_SERIALIZED_SIZE;
 
-        Bytes to_hash;
+        ecgroup::Bytes to_hash;
         to_hash.reserve(total_size);
 
-        auto append = [&](const Bytes& b) {
+        auto append = [&](const ecgroup::Bytes& b) {
             to_hash.insert(to_hash.end(), b.begin(), b.end());
         };
         
@@ -72,7 +123,7 @@ namespace bbsgs {
         append(R4.to_bytes());
         append(R5.to_bytes());
         
-        return Scalar::hash_to_scalar(to_hash);
+        return ecgroup::Scalar::hash_to_scalar(to_hash);
     }
 
 } // namespace bbsgs
