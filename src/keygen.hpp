@@ -6,6 +6,7 @@
 namespace bbsgs {
 
     void bbs04_setup(GroupPublicKey &gpk, OpenerSecretKey &osk, IssuerSecretKey &sk);
+    UserSecretKey bbs04_user_keygen(IssuerSecretKey const &isk, GroupPublicKey const &gpk);
 
 } // namespace bbsgs
 

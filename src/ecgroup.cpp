@@ -22,6 +22,31 @@ namespace ecgroup {
         mcl::bn::Fr::inv(inv.value, this->value);
         return inv;
     }
+
+    Scalar Scalar::negate() const {
+        Scalar result;
+        mcl::bn::Fr::neg(result.value, this->value);
+        return result;
+    }
+
+    Scalar Scalar::add(const Scalar& a, const Scalar& b) {
+        Scalar result;
+        mcl::bn::Fr::add(result.value, a.value, b.value);
+        return result;
+    }
+
+    Scalar Scalar::mul(const Scalar& a, const Scalar& b) {
+        Scalar result;
+        mcl::bn::Fr::mul(result.value, a.get_underlying(), b.get_underlying());
+        return result;
+    }
+    
+    Scalar Scalar::neg(const Scalar& s) {
+        Scalar result;
+        mcl::bn::Fr::neg(result.value, s.get_underlying());
+        return result;
+    }
+
     std::string Scalar::to_string() const { return value.getStr(16); }
     Bytes Scalar::to_bytes() const {
         Bytes b(FR_SERIALIZED_SIZE);
@@ -31,6 +56,12 @@ namespace ecgroup {
     Scalar Scalar::hash_to_scalar(const std::string& message) {
         Scalar s;
         s.value.setHashOf(message);
+        return s;
+    }
+    Scalar Scalar::hash_to_scalar(const Bytes& data) {
+        Scalar s;
+        // setHashOf is designed to take raw byte buffers
+        s.value.setHashOf(data.data(), data.size());
         return s;
     }
     Scalar Scalar::from_string(const std::string& s) {
@@ -44,6 +75,15 @@ namespace ecgroup {
         return scalar;
     }
     bool Scalar::operator==(const Scalar& other) const { return value == other.value; }
+
+    Scalar Scalar::operator+(const Scalar& other) const {
+        return Scalar::add(*this, other);
+    }
+
+    Scalar Scalar::operator*(const Scalar& other) const {
+        return Scalar::mul(*this, other);
+    }
+    
     const mcl::bn::Fr& Scalar::get_underlying() const { return value; }
     mcl::bn::Fr& Scalar::get_underlying() { return value; }
 
@@ -58,7 +98,8 @@ namespace ecgroup {
     G1Point G1Point::get_random() {
         Scalar s;
         s.set_random();
-        G1Point g1_generator = G1Point::hash_and_map_to("ecgroup_g1_generator");
+        G1Point g1_generator;
+        mcl::bn::hashAndMapToG1(g1_generator.value, "ecgroup_g1_generator");
         return G1Point::mul(g1_generator, s);
     }
     G1Point G1Point::hash_and_map_to(const std::string& message) {
@@ -135,12 +176,46 @@ namespace ecgroup {
     PairingResult::PairingResult() {}
     PairingResult::PairingResult(const mcl::bn::Fp12& v) : value(v) {}
     bool PairingResult::operator==(const PairingResult& other) const { return value == other.value; }
+    const mcl::bn::Fp12& PairingResult::get_underlying() const { return value; }
+
+    PairingResult PairingResult::pow(const Scalar& s) const {
+        PairingResult result;
+        mcl::bn::Fp12::pow(result.value, this->value, s.get_underlying());
+        return result;
+    }
+
+    PairingResult PairingResult::mul(const PairingResult& a, const PairingResult& b) {
+        PairingResult result;
+        result.value = a.get_underlying() * b.get_underlying();
+        return result;
+    }
+
+    PairingResult PairingResult::operator*(const PairingResult& other) const {
+        return PairingResult::mul(*this, other);
+    }
+    
+    PairingResult PairingResult::div(const PairingResult& a, const PairingResult& b) {
+        PairingResult result;
+        // mcl::bn::Fp12 overloads the division operator
+        result.value = a.get_underlying() / b.get_underlying();
+        return result;
+    }
+
+    PairingResult PairingResult::operator/(const PairingResult& other) const {
+        return PairingResult::div(*this, other);
+    }
 
     // --- Pairing Function Implementation ---
     PairingResult pairing(const G1Point& p, const G2Point& q) {
         mcl::bn::Fp12 e;
         mcl::bn::pairing(e, p.get_underlying(), q.get_underlying());
         return PairingResult(e);
+    }
+
+    Bytes PairingResult::to_bytes() const {
+        Bytes b(GT_SERIALIZED_SIZE);
+        value.serialize(b.data(), b.size());
+        return b;
     }
 
 } // namespace ecgroup

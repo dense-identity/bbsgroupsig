@@ -1,4 +1,4 @@
-#include "setup.hpp"
+#include "keygen.hpp"
 
 namespace bbsgs {
 
@@ -16,5 +16,13 @@ namespace bbsgs {
         isk.gamma = ecgroup::Scalar::get_random();
         gpk.w = ecgroup::G2Point::mul(gpk.g2, isk.gamma);
     };
+
+    UserSecretKey bbs04_user_keygen(IssuerSecretKey const &isk, GroupPublicKey const &gpk) {
+        UserSecretKey usk;
+        usk.x = ecgroup::Scalar::get_random();
+        ecgroup::Scalar gamma_plus_x = ecgroup::Scalar::add(isk.gamma, usk.x);
+        usk.A = ecgroup::G1Point::mul(gpk.g1, gamma_plus_x.inverse());
+        return usk;
+    }
 
 } // namespace bbsgs

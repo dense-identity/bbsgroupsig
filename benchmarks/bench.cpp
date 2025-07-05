@@ -37,15 +37,51 @@ void bench_bbs04_setup() {
         bbs04_setup(gpk, osk, isk);
     }
     stop_timer("Setup", start);
-    // std::cout << "GroupPublicKey gpk: " << bbsgs::utils::bytes_to_hex(gpk.to_bytes()) << std::endl;
+}
+
+void bench_bbs04_user_keygen() {
+    bbsgs::GroupPublicKey gpk;
+    bbsgs::OpenerSecretKey osk;
+    bbsgs::IssuerSecretKey isk;
+    bbsgs::UserSecretKey usk;
+
+    bbs04_setup(gpk, osk, isk);
+
+    auto start = start_timer();
+    for (int i = 0; i < numIters; ++i) {
+        usk = bbs04_user_keygen(isk, gpk);
+    }
+    stop_timer("User Key Generation", start);
+}
+
+void bench_bbs04_sign() {
+    bbsgs::GroupPublicKey gpk;
+    bbsgs::OpenerSecretKey osk;
+    bbsgs::IssuerSecretKey isk;
+    std::string msg = "hello world"; 
+
+    bbs04_setup(gpk, osk, isk);
+    bbsgs::UserSecretKey usk = bbs04_user_keygen(isk, gpk);
+
+    auto start = start_timer();
+    bbsgs::GroupSignature sigma;
+    for (int i = 0; i < numIters; ++i) {
+        sigma = bbs04_sign(gpk, usk, ecgroup::Bytes(msg.begin(), msg.end()));
+    }
+    stop_timer("Signging", start);
+
+    std::cout << "Group Signature: " << bbsgs::utils::bytes_to_hex(sigma.to_bytes()) << std::endl;
 }
 
 int main(int argc, char* argv[])
 {
     ecgroup::init_pairing();
 
-    bench_pairing();
-    bench_bbs04_setup();
+    // bench_pairing();
+    // bench_bbs04_setup();
+    // bench_bbs04_user_keygen();
+
+    bench_bbs04_sign();
 
     return 0;
 }

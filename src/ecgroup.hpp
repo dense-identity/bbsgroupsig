@@ -14,6 +14,7 @@ namespace ecgroup {
     constexpr size_t FR_SERIALIZED_SIZE = 32;
     constexpr size_t G1_SERIALIZED_SIZE = 32; // MCL serializes G1 in compressed form by default
     constexpr size_t G2_SERIALIZED_SIZE = 64; // MCL serializes G2 in compressed form by default
+    constexpr size_t GT_SERIALIZED_SIZE = 384;
 
     class G1Point;
     class G2Point;
@@ -25,18 +26,27 @@ namespace ecgroup {
     class Scalar {
     public:
         Scalar();
+        Scalar(const mcl::bn::Fr& v): value(v) {};
 
         void set_random();
         static Scalar get_random();
         Scalar inverse() const;
+        Scalar negate() const;
+        static Scalar add(const Scalar& a, const Scalar& b);
+        static Scalar mul(const Scalar& a, const Scalar& b);
+        static Scalar neg(const Scalar& s);
+
         std::string to_string() const;
         Bytes to_bytes() const;
 
         static Scalar hash_to_scalar(const std::string& message);
+        static Scalar hash_to_scalar(const Bytes& data);
         static Scalar from_string(const std::string& s);
         static Scalar from_bytes(const Bytes& b);
 
         bool operator==(const Scalar& other) const;
+        Scalar operator+(const Scalar& other) const;
+        Scalar operator*(const Scalar& other) const;
 
         const mcl::bn::Fr& get_underlying() const;
         mcl::bn::Fr& get_underlying();
@@ -92,10 +102,21 @@ namespace ecgroup {
     class PairingResult {
     public:
         PairingResult();
+        explicit PairingResult(const mcl::bn::Fp12& v);
 
         bool operator==(const PairingResult& other) const;
+        const mcl::bn::Fp12& get_underlying() const;
 
-        explicit PairingResult(const mcl::bn::Fp12& v);
+        Bytes to_bytes() const;
+        
+        // Exponentiation and multiplication
+        PairingResult pow(const Scalar& s) const;
+        static PairingResult mul(const PairingResult& a, const PairingResult& b);
+        PairingResult operator*(const PairingResult& other) const;
+
+        // Division
+        static PairingResult div(const PairingResult& a, const PairingResult& b); // New
+        PairingResult operator/(const PairingResult& other) const; // New
 
     private:
         mcl::bn::Fp12 value;

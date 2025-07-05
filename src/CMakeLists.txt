@@ -22,8 +22,9 @@ target_link_libraries(ecgroup PRIVATE mcl)
 # -----------------------------------------------------------------------------
 add_library(bbsgs
     bbsgs.cpp
-    setup.cpp
+    keygen.cpp
     helpers.cpp
+    signature.cpp
 )
 
 # PUBLIC includes are for consumers of the bbsgs library
