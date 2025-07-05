@@ -27,6 +27,7 @@ namespace ecgroup {
         Scalar();
 
         void set_random();
+        static Scalar get_random();
         Scalar inverse() const;
         std::string to_string() const;
         Bytes to_bytes() const;

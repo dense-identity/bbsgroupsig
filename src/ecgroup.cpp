@@ -8,7 +8,15 @@ namespace ecgroup {
 
     // --- Scalar Implementation ---
     Scalar::Scalar() {}
+    
     void Scalar::set_random() { value.setRand(); }
+
+    Scalar Scalar::get_random() {
+        Scalar s;
+        s.set_random();
+        return s;
+    }
+
     Scalar Scalar::inverse() const {
         Scalar inv;
         mcl::bn::Fr::inv(inv.value, this->value);

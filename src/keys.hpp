@@ -2,6 +2,7 @@
 #define BBSGS_KEYS_HPP
 
 #include "ecgroup.hpp"
+#include "helpers.hpp"
 #include <string>
 #include <vector>
 
