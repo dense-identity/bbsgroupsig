@@ -95,6 +95,26 @@ namespace bbs04 {
 
         return isk;
     }
+    
+    // --- OpenerKey Implementation ---
+    std::string OpenerKey::to_string() const {
+        return utils::bytes_to_hex(this->to_bytes());
+    }
+
+    OpenerKey OpenerKey::from_string(const std::string& s) {
+        ecgroup::Bytes bytes = utils::hex_to_bytes(s);
+        return OpenerKey::from_bytes(bytes);
+    }
+
+    ecgroup::Bytes OpenerKey::to_bytes() const {
+        return gamma.to_bytes();
+    }
+
+    OpenerKey OpenerKey::from_bytes(const ecgroup::Bytes& b) {
+        OpenerKey ok;
+        ok.gamma = ecgroup::Scalar::from_bytes(b);
+        return ok;
+    }
 
 
     // --- UserSecretKey Implementation ---

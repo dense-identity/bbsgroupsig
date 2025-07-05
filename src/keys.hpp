@@ -31,6 +31,15 @@ namespace bbs04 {
         static IssuerSecretKey from_bytes(const ecgroup::Bytes& b);
     };
 
+    struct OpenerKey {
+        ecgroup::Scalar gamma;
+
+        std::string to_string() const;
+        ecgroup::Bytes to_bytes() const;
+        static OpenerKey from_string(const std::string& s);
+        static OpenerKey from_bytes(const ecgroup::Bytes& b);
+    };
+
     struct UserSecretKey {
         ecgroup::G1Point A;
         ecgroup::Scalar x;
