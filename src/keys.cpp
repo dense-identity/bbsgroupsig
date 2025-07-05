@@ -5,11 +5,13 @@ namespace bbs04 {
 
     // --- GroupPublicKey Implementation ---
     std::string GroupPublicKey::to_string() const {
-        return bytes_to_hex(this->to_bytes());
+        // Use the helper from the new namespace
+        return utils::bytes_to_hex(this->to_bytes());
     }
 
     GroupPublicKey GroupPublicKey::from_string(const std::string& s) {
-        ecgroup::Bytes bytes = hex_to_bytes(s);
+        // Use the helper from the new namespace
+        ecgroup::Bytes bytes = utils::hex_to_bytes(s);
         return GroupPublicKey::from_bytes(bytes);
     }
 
@@ -32,6 +34,10 @@ namespace bbs04 {
         size_t offset = 0;
         
         auto slice = [&](size_t len) {
+            // Ensure bounds checking for safety, though the sizes are fixed here
+            if (offset + len > b.size()) {
+                throw std::out_of_range("Attempted to read beyond end of bytes for GroupPublicKey deserialization.");
+            }
             ecgroup::Bytes sub(b.begin() + offset, b.begin() + offset + len);
             offset += len;
             return sub;
@@ -50,11 +56,13 @@ namespace bbs04 {
 
     // --- IssuerSecretKey Implementation ---
     std::string IssuerSecretKey::to_string() const {
-        return bytes_to_hex(this->to_bytes());
+        // Use the helper from the new namespace
+        return utils::bytes_to_hex(this->to_bytes());
     }
 
     IssuerSecretKey IssuerSecretKey::from_string(const std::string& s) {
-        ecgroup::Bytes bytes = hex_to_bytes(s);
+        // Use the helper from the new namespace
+        ecgroup::Bytes bytes = utils::hex_to_bytes(s);
         return IssuerSecretKey::from_bytes(bytes);
     }
 
@@ -73,6 +81,10 @@ namespace bbs04 {
         size_t offset = 0;
         
         auto slice = [&](size_t len) {
+            // Ensure bounds checking
+            if (offset + len > b.size()) {
+                throw std::out_of_range("Attempted to read beyond end of bytes for IssuerSecretKey deserialization.");
+            }
             ecgroup::Bytes sub(b.begin() + offset, b.begin() + offset + len);
             offset += len;
             return sub;
@@ -87,11 +99,13 @@ namespace bbs04 {
 
     // --- UserSecretKey Implementation ---
     std::string UserSecretKey::to_string() const {
-        return bytes_to_hex(this->to_bytes());
+        // Use the helper from the new namespace
+        return utils::bytes_to_hex(this->to_bytes());
     }
 
     UserSecretKey UserSecretKey::from_string(const std::string& s) {
-        ecgroup::Bytes bytes = hex_to_bytes(s);
+        // Use the helper from the new namespace
+        ecgroup::Bytes bytes = utils::hex_to_bytes(s);
         return UserSecretKey::from_bytes(bytes);
     }
 
@@ -110,6 +124,10 @@ namespace bbs04 {
         size_t offset = 0;
         
         auto slice = [&](size_t len) {
+            // Ensure bounds checking
+            if (offset + len > b.size()) {
+                throw std::out_of_range("Attempted to read beyond end of bytes for UserSecretKey deserialization.");
+            }
             ecgroup::Bytes sub(b.begin() + offset, b.begin() + offset + len);
             offset += len;
             return sub;

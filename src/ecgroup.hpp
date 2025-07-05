@@ -1,5 +1,5 @@
 #ifndef SHIM_ECGROUP_HPP
-#define SHim_ECGROUP_HPP
+#define SHIM_ECGROUP_HPP
 
 #include <mcl/bn256.hpp>
 #include <vector>
@@ -10,9 +10,10 @@ namespace ecgroup {
     // Define a byte vector type for clarity
     using Bytes = std::vector<uint8_t>;
 
+    // These sizes are consistent with MCL's default serialization for BN256
     constexpr size_t FR_SERIALIZED_SIZE = 32;
-    constexpr size_t G1_SERIALIZED_SIZE = 32;
-    constexpr size_t G2_SERIALIZED_SIZE = 64;
+    constexpr size_t G1_SERIALIZED_SIZE = 32; // MCL serializes G1 in compressed form by default
+    constexpr size_t G2_SERIALIZED_SIZE = 64; // MCL serializes G2 in compressed form by default
 
     class G1Point;
     class G2Point;
