@@ -1,11 +1,12 @@
 #ifndef BBS04_KEYS_HPP
 #define BBS04_KEYS_HPP
 
-#include "ecgroup.hpp" // For G1Point, G2Point, Scalar
+#include "ecgroup.hpp"
+#include <string>
+#include <vector>
 
 namespace bbs04 {
 
-    // Group Public Key (gpk)
     struct GroupPublicKey {
         ecgroup::G1Point g1;
         ecgroup::G1Point h;
@@ -13,18 +14,31 @@ namespace bbs04 {
         ecgroup::G1Point v;
         ecgroup::G2Point g2;
         ecgroup::G2Point w;
+
+        std::string to_string() const;
+        ecgroup::Bytes to_bytes() const;
+        static GroupPublicKey from_string(const std::string& s);
+        static GroupPublicKey from_bytes(const ecgroup::Bytes& b);
     };
 
-    // Issuer Secret Key (isk)
     struct IssuerSecretKey {
         ecgroup::Scalar xi1;
         ecgroup::Scalar xi2;
+
+        std::string to_string() const;
+        ecgroup::Bytes to_bytes() const;
+        static IssuerSecretKey from_string(const std::string& s);
+        static IssuerSecretKey from_bytes(const ecgroup::Bytes& b);
     };
 
-    // User Secret Key (usk)
     struct UserSecretKey {
         ecgroup::G1Point A;
         ecgroup::Scalar x;
+
+        std::string to_string() const;
+        ecgroup::Bytes to_bytes() const;
+        static UserSecretKey from_string(const std::string& s);
+        static UserSecretKey from_bytes(const ecgroup::Bytes& b);
     };
 
 } // namespace bbs04

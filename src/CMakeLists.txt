@@ -3,6 +3,7 @@
 # -----------------------------------------------------------------------------
 add_library(ecgroup
     ecgroup.cpp
+    keys.cpp
 )
 
 # ecgroup needs to know where its own header is
