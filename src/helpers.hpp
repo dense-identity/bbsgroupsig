@@ -1,12 +1,12 @@
-#ifndef BBS04_HELPERS_HPP
-#define BBS04_HELPERS_HPP
+#ifndef BBSGS_HELPERS_HPP
+#define BBSGS_HELPERS_HPP
 
 #include "ecgroup.hpp" // Required for ecgroup::Bytes
 #include <iomanip>
 #include <sstream>     // For std::stringstream
 #include <stdexcept>   // For std::invalid_argument
 
-namespace bbs04 {
+namespace bbsgs {
 namespace utils { // New namespace for helper functions
 
     // Converts a vector of bytes to a hex string.
@@ -17,12 +17,12 @@ namespace utils { // New namespace for helper functions
     ecgroup::Bytes hex_to_bytes(const std::string& hex);
 
 } // namespace utils
-} // namespace bbs04
+} // namespace bbsgs
 
 // Implementation details for the helper functions
 // Placing implementation in .hpp is common for small helper functions
 // or when using them across multiple translation units without a separate .cpp
-namespace bbs04 {
+namespace bbsgs {
 namespace utils {
 
     std::string bytes_to_hex(const ecgroup::Bytes& bytes) {
@@ -51,6 +51,6 @@ namespace utils {
     }
 
 } // namespace utils
-} // namespace bbs04
+} // namespace bbsgs
 
-#endif // BBS04_HELPERS_HPP
+#endif // BBSGS_HELPERS_HPP

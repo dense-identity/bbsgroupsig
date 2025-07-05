@@ -123,8 +123,6 @@ TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
         std::string s1_str = s1.to_string();
         ecgroup::Bytes s1_bytes = s1.to_bytes();
 
-        // std::cout << "Size of Scalar: " << s1_bytes.size() << std::endl;
-
         ecgroup::Scalar s1_from_str = ecgroup::Scalar::from_string(s1_str);
         ecgroup::Scalar s1_from_bytes = ecgroup::Scalar::from_bytes(s1_bytes);
         REQUIRE(s1 == s1_from_str);
@@ -139,8 +137,6 @@ TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
         REQUIRE(p1 == p1_from_str);
         REQUIRE(p1 == p1_from_bytes);
 
-        // std::cout << "Size of G1: " << p1_bytes.size() << std::endl;
-
         // Test round-trip serialization for G2Point
         ecgroup::G2Point p2 = ecgroup::G2Point::get_random();
         std::string p2_str = p2.to_string();
@@ -149,7 +145,5 @@ TEST_CASE("Elliptic Curve Group Operations", "[ecgroup]") {
         ecgroup::G2Point p2_from_bytes = ecgroup::G2Point::from_bytes(p2_bytes);
         REQUIRE(p2 == p2_from_str);
         REQUIRE(p2 == p2_from_bytes);
-        
-        // std::cout << "Size of G2: " << p2_bytes.size() << std::endl;
     }
 }

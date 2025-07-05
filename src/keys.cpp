@@ -1,19 +1,7 @@
 #include "keys.hpp"
 #include "helpers.hpp"
 
-namespace bbs04 {
-
-    // --- GroupPublicKey Implementation ---
-    std::string GroupPublicKey::to_string() const {
-        // Use the helper from the new namespace
-        return utils::bytes_to_hex(this->to_bytes());
-    }
-
-    GroupPublicKey GroupPublicKey::from_string(const std::string& s) {
-        // Use the helper from the new namespace
-        ecgroup::Bytes bytes = utils::hex_to_bytes(s);
-        return GroupPublicKey::from_bytes(bytes);
-    }
+namespace bbsgs {
 
     ecgroup::Bytes GroupPublicKey::to_bytes() const {
         ecgroup::Bytes out;
@@ -54,19 +42,7 @@ namespace bbs04 {
     }
 
 
-    // --- IssuerSecretKey Implementation ---
-    std::string IssuerSecretKey::to_string() const {
-        // Use the helper from the new namespace
-        return utils::bytes_to_hex(this->to_bytes());
-    }
-
-    IssuerSecretKey IssuerSecretKey::from_string(const std::string& s) {
-        // Use the helper from the new namespace
-        ecgroup::Bytes bytes = utils::hex_to_bytes(s);
-        return IssuerSecretKey::from_bytes(bytes);
-    }
-
-    ecgroup::Bytes IssuerSecretKey::to_bytes() const {
+    ecgroup::Bytes OpenerSecretKey::to_bytes() const {
         ecgroup::Bytes out;
         auto append = [&](const ecgroup::Bytes& b) {
             out.insert(out.end(), b.begin(), b.end());
@@ -76,14 +52,14 @@ namespace bbs04 {
         return out;
     }
 
-    IssuerSecretKey IssuerSecretKey::from_bytes(const ecgroup::Bytes& b) {
-        IssuerSecretKey isk;
+    OpenerSecretKey OpenerSecretKey::from_bytes(const ecgroup::Bytes& b) {
+        OpenerSecretKey isk;
         size_t offset = 0;
         
         auto slice = [&](size_t len) {
             // Ensure bounds checking
             if (offset + len > b.size()) {
-                throw std::out_of_range("Attempted to read beyond end of bytes for IssuerSecretKey deserialization.");
+                throw std::out_of_range("Attempted to read beyond end of bytes for OpenerSecretKey deserialization.");
             }
             ecgroup::Bytes sub(b.begin() + offset, b.begin() + offset + len);
             offset += len;
@@ -95,38 +71,15 @@ namespace bbs04 {
 
         return isk;
     }
-    
-    // --- OpenerKey Implementation ---
-    std::string OpenerKey::to_string() const {
-        return utils::bytes_to_hex(this->to_bytes());
-    }
 
-    OpenerKey OpenerKey::from_string(const std::string& s) {
-        ecgroup::Bytes bytes = utils::hex_to_bytes(s);
-        return OpenerKey::from_bytes(bytes);
-    }
-
-    ecgroup::Bytes OpenerKey::to_bytes() const {
+    ecgroup::Bytes IssuerSecretKey::to_bytes() const {
         return gamma.to_bytes();
     }
 
-    OpenerKey OpenerKey::from_bytes(const ecgroup::Bytes& b) {
-        OpenerKey ok;
+    IssuerSecretKey IssuerSecretKey::from_bytes(const ecgroup::Bytes& b) {
+        IssuerSecretKey ok;
         ok.gamma = ecgroup::Scalar::from_bytes(b);
         return ok;
-    }
-
-
-    // --- UserSecretKey Implementation ---
-    std::string UserSecretKey::to_string() const {
-        // Use the helper from the new namespace
-        return utils::bytes_to_hex(this->to_bytes());
-    }
-
-    UserSecretKey UserSecretKey::from_string(const std::string& s) {
-        // Use the helper from the new namespace
-        ecgroup::Bytes bytes = utils::hex_to_bytes(s);
-        return UserSecretKey::from_bytes(bytes);
     }
 
     ecgroup::Bytes UserSecretKey::to_bytes() const {
@@ -159,4 +112,4 @@ namespace bbs04 {
         return usk;
     }
 
-} // namespace bbs04
+} // namespace bbsgs
