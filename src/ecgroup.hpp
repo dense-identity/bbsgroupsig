@@ -10,11 +10,9 @@ namespace ecgroup {
     // Define a byte vector type for clarity
     using Bytes = std::vector<uint8_t>;
 
-    // Define fixed sizes for serialization to be used across the project.
-    // This avoids issues with non-static methods in the underlying library.
     constexpr size_t FR_SERIALIZED_SIZE = 32;
-    constexpr size_t G1_SERIALIZED_SIZE = 128; //mcl::bn::G1::getSerializedSize();
-    constexpr size_t G2_SERIALIZED_SIZE = 128; //mcl::bn::G2::getSerializedSize();
+    constexpr size_t G1_SERIALIZED_SIZE = 32;
+    constexpr size_t G2_SERIALIZED_SIZE = 64;
 
     class G1Point;
     class G2Point;
