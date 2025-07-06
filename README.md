@@ -12,6 +12,7 @@ This implementation is built upon the high-performance [mcl](https://github.com/
     * `sign`: Generates a group signature on a message.
     * `verify`: Verifies if a group signature is valid for a given message.
     * `open`: Allows the group manager to identify the signer of a valid signature.
+* **t-of-n Threshold Variants***: In progress, this implementation will support [distributed variants](https://www.orbs.com/assets/docs/white-papers/Crypto_Group_signatures-2.pdf) of the BBS04 scheme, allowing for more flexible group management and security models.
 * **Performance Optimized**: Utilizes pairing product equations to significantly speed up the most computationally expensive operations:
     * **Verification**: Reduces the number of pairing computations from 5 to 2 as described in [https://github.com/hl-tang/JPBC-BBS04/blob/main/README.pdf](https://github.com/hl-tang/JPBC-BBS04/blob/main/README.pdf).
     * **Signing**: Reduces the number of pairing computations from 3 to 2 as described in [/docs/optimizations.md](/docs/optimizations.md).
