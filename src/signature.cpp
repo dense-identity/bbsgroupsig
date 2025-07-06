@@ -61,16 +61,25 @@ namespace bbsgs {
                                     .add(ecgroup::G1Point::mul(gpk.v, sigma.s_delta_2.negate()));
         
         // R'_3 = e(T3,g2)^s_x * e(h,w)^-(s_alpha+s_beta) * e(h,g2)^-(s_delta1+s_delta2) * [e(T3,w)/e(g1,g2)]^c
-        ecgroup::Scalar s_ab_neg = (sigma.s_alpha + sigma.s_beta).negate();
-        ecgroup::Scalar s_d_neg = (sigma.s_delta_1 + sigma.s_delta_2).negate();
+        ecgroup::G1Point t3_pow_sx = ecgroup::G1Point::mul(sigma.T3, sigma.s_x);
+        ecgroup::Scalar s_d_sum = sigma.s_delta_1 + sigma.s_delta_2;
+        ecgroup::G1Point h_term = ecgroup::G1Point::mul(gpk.h, s_d_sum).negate();
+        ecgroup::G1Point g1_term = ecgroup::G1Point::mul(gpk.g1, sigma.c).negate();
 
-        ecgroup::PairingResult term1 = ecgroup::pairing(sigma.T3, gpk.g2).pow(sigma.s_x);
-        ecgroup::PairingResult term2 = ecgroup::pairing(gpk.h, gpk.w).pow(s_ab_neg);
-        ecgroup::PairingResult term3 = ecgroup::pairing(gpk.h, gpk.g2).pow(s_d_neg);
-        ecgroup::PairingResult term4_base = ecgroup::pairing(sigma.T3, gpk.w) / ecgroup::pairing(gpk.g1, gpk.g2);
-        ecgroup::PairingResult term4 = term4_base.pow(sigma.c);
+        ecgroup::G1Point pairing1_arg1 = t3_pow_sx.add(h_term).add(g1_term);
 
-        ecgroup::PairingResult R3_prime = term1 * term2 * term3 * term4;
+        // 2. Calculate the aggregate G1 point for the second pairing:
+        // arg2 = T3^c * h^-(s_alpha + s_beta)
+        ecgroup::G1Point t3_pow_c = ecgroup::G1Point::mul(sigma.T3, sigma.c);
+        ecgroup::Scalar s_ab_sum = sigma.s_alpha + sigma.s_beta;
+        ecgroup::G1Point h_term2 = ecgroup::G1Point::mul(gpk.h, s_ab_sum).negate();
+
+        ecgroup::G1Point pairing2_arg1 = t3_pow_c.add(h_term2);
+
+        // 3. Compute the two pairings and multiply the results
+        ecgroup::PairingResult e1 = ecgroup::pairing(pairing1_arg1, gpk.g2);
+        ecgroup::PairingResult e2 = ecgroup::pairing(pairing2_arg1, gpk.w);
+        ecgroup::PairingResult R3_prime = e1 * e2;
         
         // Hash the recomputed R values to get the challenge
         ecgroup::Scalar c_prime = hash_all_to_scalar(
