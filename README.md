@@ -93,6 +93,7 @@ The following example demonstrates the end-to-end flow of the BBS04 scheme. You 
 ```cpp
 ecgroup::init_pairing();
 ```
+This step is necessary to set up the elliptic curve and pairing parameters used by the BBS04 scheme. It should be done only once at the start of your program.
 
 ### SETUP: The group manager generates the system parameters
 ```cpp
@@ -100,19 +101,16 @@ bbsgs::GroupPublicKey gpk;
 bbsgs::OpenerSecretKey osk;
 bbsgs::IssuerSecretKey isk;
 bbsgs::bbs04_setup(gpk, osk, isk);
-std::cout << "✅ System setup complete." << std::endl;
 ```
 ### JOIN: A new user requests and receives a secret key
 ```cpp
 bbsgs::UserSecretKey usk = bbsgs::bbs04_user_keygen(isk, gpk);
-std::cout << "✅ User key generated." << std::endl;
 ```
 
 ### SIGN: The user signs a message
 ```cpp
 ecgroup::Bytes message = {'h', 'e', 'l', 'l', 'o'};
 bbsgs::GroupSignature sigma = bbsgs::bbs04_sign(gpk, usk, message);
-std::cout << "✅ Message signed." << std::endl;
 ```
 
 ### VERIFY: A third party verifies the signature
