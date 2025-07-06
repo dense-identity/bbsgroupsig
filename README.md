@@ -1,6 +1,6 @@
 # C++ Implementation of BBS04 Group Signatures
 
-This repository provides a C++ implementation of the group signature scheme proposed by [Boneh, Boyen, and Shacham in 2004 (BBS04)](https://crypto.stanford.edu/~dabo/pubs/papers/groupsigs.pdf). The scheme allows members of a group to sign messages on behalf of the group without revealing their individual identities. However, in the case of a dispute, a designated group manager can revoke a user's anonymity and trace the signature back to the original signer.
+This repository provides a C++ implementation of the group signature scheme proposed by Boneh, Boyen, and Shacham in 2004 (BBS04) in their paper [Short Group Signatures](https://crypto.stanford.edu/~dabo/pubs/papers/groupsigs.pdf). The scheme allows members of a group to sign messages on behalf of the group without revealing their individual identities. However, in the case of a dispute, a designated group manager can revoke a user's anonymity and trace the signature back to the original signer.
 
 This implementation is built upon the high-performance [mcl](https://github.com/herumi/mcl) pairing-based cryptography library and is designed to be both secure and efficient.
 
@@ -51,57 +51,88 @@ We also use [Catch2](https://github.com/catchorg/Catch2) for unit testing but it
     ```
     All tests should pass.
 
+    ```bash
+    ./build/tests/run_bbsgs_tests 
+    Randomness seeded to: 3585119377
+    ===============================================================================
+    All tests passed (34 assertions in 2 test cases)
+    ```
+
 4.  **Run the benchmarks**:
     ```bash
     ./build/benchmarks/run_bbsgs_benchmarks
     ```
-    This will output the average execution time in milliseconds for each cryptographic operation.
+    This will output the average execution time in milliseconds for each cryptographic operation. The results below are run on a VM with 32 vCPUs and 62GB RAM.
+    ```bash
+    ./build/benchmarks/run_bbsgs_benchmarks 
+    --- Low-Level Cryptographic Primitives (Avg over 10000 iters) ---
+    Scalar Multiplication       : 0.000063 ms
+    G1 Scalar Multiplication    : 0.060911 ms
+    G2 Scalar Multiplication    : 0.096481 ms
+    Pairing Exponentiation      : 0.245335 ms
+    Pairing                     : 0.463038 ms
+
+    --- High-Level Protocol Operations (Avg over 100 iters) ---
+    Full Setup                  : 1.205559 ms
+    User Key Generation         : 0.066865 ms
+    Sign                        : 1.732059 ms
+    Verify                      : 1.792356 ms
+    Open                        : 0.127576 ms
+    ```
 
 ## API Usage Example
 
 The following example demonstrates the end-to-end flow of the BBS04 scheme. You can also take a look at the `benchmarks/bench.cpp` and `tests/test_bbsgs.cpp` files for more detailed usage.
 
+### Include the necessary headers:
 ```cpp
-#include <iostream>
 #include "bbsgs/bbsgs.hpp"
+```
 
-int main() {
-    // Initialize the underlying pairing library
-    ecgroup::init_pairing();
+### Initialize MCL pairing functionality.
+```cpp
+ecgroup::init_pairing();
+```
 
-    // 1. SETUP: The group manager generates the system parameters
-    bbsgs::GroupPublicKey gpk;
-    bbsgs::OpenerSecretKey osk;
-    bbsgs::IssuerSecretKey isk;
-    bbsgs::bbs04_setup(gpk, osk, isk);
-    std::cout << "✅ System setup complete." << std::endl;
+### SETUP: The group manager generates the system parameters
+```cpp
+bbsgs::GroupPublicKey gpk;
+bbsgs::OpenerSecretKey osk;
+bbsgs::IssuerSecretKey isk;
+bbsgs::bbs04_setup(gpk, osk, isk);
+std::cout << "✅ System setup complete." << std::endl;
+```
+### JOIN: A new user requests and receives a secret key
+```cpp
+bbsgs::UserSecretKey usk = bbsgs::bbs04_user_keygen(isk, gpk);
+std::cout << "✅ User key generated." << std::endl;
+```
 
-    // 2. JOIN: A new user requests and receives a secret key
-    bbsgs::UserSecretKey usk = bbsgs::bbs04_user_keygen(isk, gpk);
-    std::cout << "✅ User key generated." << std::endl;
+### SIGN: The user signs a message
+```cpp
+ecgroup::Bytes message = {'h', 'e', 'l', 'l', 'o'};
+bbsgs::GroupSignature sigma = bbsgs::bbs04_sign(gpk, usk, message);
+std::cout << "✅ Message signed." << std::endl;
+```
 
-    // 3. SIGN: The user signs a message
-    ecgroup::Bytes message = {'h', 'e', 'l', 'l', 'o'};
-    bbsgs::GroupSignature sigma = bbsgs::bbs04_sign(gpk, usk, message);
-    std::cout << "✅ Message signed." << std::endl;
-
-    // 4. VERIFY: A third party verifies the signature
-    bool is_valid = bbsgs::bbs04_verify(gpk, message, sigma);
-    if (is_valid) {
-        std::cout << "✅ Signature is VALID." << std::endl;
-    } else {
-        std::cout << "❌ Signature is INVALID." << std::endl;
-    }
-
-    // 5. OPEN: In case of a dispute, the manager traces the signature
-    ecgroup::G1Point opened_A = bbsgs::bbs04_open(gpk, osk, sigma);
-
-    // Check if the opened credential matches the user's original credential
-    if (opened_A == usk.A) {
-        std::cout << "✅ Signature successfully opened and traced to the user." << std::endl;
-    } else {
-        std::cout << "❌ Failed to open the signature." << std::endl;
-    }
-
-    return 0;
+### VERIFY: A third party verifies the signature
+```cpp
+bool is_valid = bbsgs::bbs04_verify(gpk, message, sigma);
+if (is_valid) {
+    std::cout << "✅ Signature is VALID." << std::endl;
+} else {
+    std::cout << "❌ Signature is INVALID." << std::endl;
 }
+```
+
+### OPEN: In case of a dispute, the manager traces the signature
+```cpp
+ecgroup::G1Point opened_A = bbsgs::bbs04_open(gpk, osk, sigma);
+
+// Check if the opened credential matches the user's original credential
+if (opened_A == usk.A) {
+    std::cout << "✅ Signature successfully opened and traced to the user." << std::endl;
+} else {
+    std::cout << "❌ Failed to open the signature." << std::endl;
+}
+```
