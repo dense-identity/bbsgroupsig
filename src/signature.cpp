@@ -24,10 +24,24 @@ namespace bbsgs {
         // Compute R values (commitments for the ZKP)
         ecgroup::G1Point R1 = ecgroup::G1Point::mul(gpk.u, r_alpha);
         ecgroup::G1Point R2 = ecgroup::G1Point::mul(gpk.v, r_beta);
-        ecgroup::PairingResult R3 = ecgroup::pairing(sigma.T3, gpk.g2).pow(r_x) 
-                                    * ecgroup::pairing(gpk.h, gpk.w).pow((r_alpha + r_beta).negate())
-                                    * ecgroup::pairing(gpk.h, gpk.g2).pow((r_delta_1 + r_delta_2).negate());
-                                    
+
+        /**
+         * Applying the optimization logic found in this repo /docs/optimizations.md to compute R3 quickly.
+         */
+        
+        ecgroup::G1Point t3_pow_rx = ecgroup::G1Point::mul(sigma.T3, r_x);
+        ecgroup::Scalar r_d_sum = r_delta_1 + r_delta_2;
+        ecgroup::G1Point h_term_g2 = ecgroup::G1Point::mul(gpk.h, r_d_sum).negate();
+
+        ecgroup::G1Point pairing1_arg = t3_pow_rx.add(h_term_g2);
+
+        ecgroup::Scalar r_ab_sum_neg = (r_alpha + r_beta).negate();
+        ecgroup::G1Point pairing2_arg = ecgroup::G1Point::mul(gpk.h, r_ab_sum_neg);
+
+        ecgroup::PairingResult e_g2 = ecgroup::pairing(pairing1_arg, gpk.g2);
+        ecgroup::PairingResult e_w = ecgroup::pairing(pairing2_arg, gpk.w);
+        ecgroup::PairingResult R3 = e_g2 * e_w;
+
         ecgroup::G1Point R4 = ecgroup::G1Point::mul(sigma.T1, r_x).add(ecgroup::G1Point::mul(gpk.u, r_delta_1.negate()));
         ecgroup::G1Point R5 = ecgroup::G1Point::mul(sigma.T2, r_x).add(ecgroup::G1Point::mul(gpk.v, r_delta_2.negate()));
 
@@ -60,6 +74,10 @@ namespace bbsgs {
         ecgroup::G1Point R5_prime = ecgroup::G1Point::mul(sigma.T2, sigma.s_x)
                                     .add(ecgroup::G1Point::mul(gpk.v, sigma.s_delta_2.negate()));
         
+        /**
+         * Applying the optimization logic found in https://github.com/hl-tang/JPBC-BBS04/blob/main/README.pdf
+         * to compute R3 quickly.
+         */
         // R'_3 = e(T3,g2)^s_x * e(h,w)^-(s_alpha+s_beta) * e(h,g2)^-(s_delta1+s_delta2) * [e(T3,w)/e(g1,g2)]^c
         ecgroup::G1Point t3_pow_sx = ecgroup::G1Point::mul(sigma.T3, sigma.s_x);
         ecgroup::Scalar s_d_sum = sigma.s_delta_1 + sigma.s_delta_2;
@@ -68,7 +86,6 @@ namespace bbsgs {
 
         ecgroup::G1Point pairing1_arg1 = t3_pow_sx.add(h_term).add(g1_term);
 
-        // 2. Calculate the aggregate G1 point for the second pairing:
         // arg2 = T3^c * h^-(s_alpha + s_beta)
         ecgroup::G1Point t3_pow_c = ecgroup::G1Point::mul(sigma.T3, sigma.c);
         ecgroup::Scalar s_ab_sum = sigma.s_alpha + sigma.s_beta;
@@ -76,7 +93,6 @@ namespace bbsgs {
 
         ecgroup::G1Point pairing2_arg1 = t3_pow_c.add(h_term2);
 
-        // 3. Compute the two pairings and multiply the results
         ecgroup::PairingResult e1 = ecgroup::pairing(pairing1_arg1, gpk.g2);
         ecgroup::PairingResult e2 = ecgroup::pairing(pairing2_arg1, gpk.w);
         ecgroup::PairingResult R3_prime = e1 * e2;
