@@ -1,24 +1,21 @@
 # -----------------------------------------------------------------------------
-# Cryptographic Shim Library
+# Cryptographic Shim Library (ecgroup)
 # -----------------------------------------------------------------------------
 add_library(ecgroup
     ecgroup.cpp
     keys.cpp
 )
 
-# ecgroup needs to know where its own header is
 target_include_directories(ecgroup
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:include>
 )
 
-# Link ecgroup against its dependency, mcl
 target_link_libraries(ecgroup PRIVATE mcl)
 
-
 # -----------------------------------------------------------------------------
-# Main Library Target Definition
+# Main C++ Library (bbsgs)
 # -----------------------------------------------------------------------------
 add_library(bbsgs
     bbsgs.cpp
@@ -27,15 +24,28 @@ add_library(bbsgs
     signature.cpp
 )
 
-# PUBLIC includes are for consumers of the bbsgs library
 target_include_directories(bbsgs
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
-# -----------------------------------------------------------------------------
-# Link bbsgs against its dependencies
-# -----------------------------------------------------------------------------
-# bbsgs now depends on your new ecgroup library
 target_link_libraries(bbsgs PRIVATE ecgroup)
+
+# -----------------------------------------------------------------------------
+# C Wrapper Library for Go Binding
+# -----------------------------------------------------------------------------
+# This target creates a static library specifically for the C API.
+add_library(bbsgs_c_interface STATIC
+    bbsgs_c.cpp
+)
+
+# The C wrapper needs to find the public headers.
+target_include_directories(bbsgs_c_interface
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/include
+)
+
+# Link the C wrapper against the main C++ library (bbsgs).
+# CMake will automatically handle the transitive dependencies (ecgroup, mcl).
+target_link_libraries(bbsgs_c_interface PRIVATE bbsgs)
