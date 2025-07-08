@@ -4,6 +4,15 @@ This repository provides a C++ implementation of the group signature scheme prop
 
 This implementation is built upon the high-performance [mcl](https://github.com/herumi/mcl) pairing-based cryptography library and is designed to be both secure and efficient.
 
+## Table of Contents
+
+- [Features](#features)
+- [Language Bindings](#language-bindings)
+- [Dependencies](#dependencies)
+- [How to Build and Run](#how-to-build-and-run)
+- [API Usage Example](#api-usage-example)
+
+
 ## Features
 
 * **Full BBS04 Protocol**: Implements all core algorithms of the scheme:
@@ -20,11 +29,23 @@ This implementation is built upon the high-performance [mcl](https://github.com/
 * **Clean Abstraction**: Provides a clear and easy-to-use API, separating the low-level elliptic curve math (`ecgroup`) from the high-level protocol logic (`bbsgs`).
 * **Testing and Benchmarking**: Includes a comprehensive test suite using Catch2 and a benchmark utility to measure the performance of all critical operations.
 
+
+## Language Bindings
+
+This C++ library is the core implementation, but it can be used in other programming languages through foreign function interface (FFI) wrappers. All official language bindings are located in the `bindings/` directory.
+
+### Go
+A Go package is available that provides a complete, idiomatic wrapper around the C++ library. For detailed instructions on how to set up your environment and use the package in your Go projects, please refer to the Go binding's dedicated README:
+
+➡️ **[bindings/go/README.md](./bindings/go/README.md)**
+
+
 ## Dependencies
 You should have the following dependencies installed to build and run this library:
 
 * A C++17 compliant compiler (e.g., GCC, Clang)
 * [CMake](https://cmake.org/) (version 3.10 or later)
+* [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/): Required for building language bindings.
 * [MCL Library](https://github.com/herumi/mcl): A library for pairing-based cryptography.
 
 We also use [Catch2](https://github.com/catchorg/Catch2) for unit testing but it is automatically installed via CMake's `FetchContent` module.
@@ -34,7 +55,7 @@ We also use [Catch2](https://github.com/catchorg/Catch2) for unit testing but it
 
 1.  **Clone the repository and its submodules** (MCL and Catch2):
     ```bash
-    git clone --recursive https://github.com/dense-identity/bbsgroupsig
+    git clone https://github.com/dense-identity/bbsgroupsig
     cd bbsgroupsig
     ```
 
@@ -45,6 +66,7 @@ We also use [Catch2](https://github.com/catchorg/Catch2) for unit testing but it
     cmake ..
     make
     ```
+    This will build the C++ static libraries and any language bindings configured in the build system.
 
 3.  **Run the tests**:
     ```bash
