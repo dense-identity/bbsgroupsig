@@ -1,6 +1,6 @@
 # C++ Implementation of BBS04 Group Signatures
 
-This repository provides a C++ implementation of the group signature scheme proposed by Boneh, Boyen, and Shacham in 2004 (BBS04) in their paper [Short Group Signatures](https://crypto.stanford.edu/~dabo/pubs/papers/groupsigs.pdf). The scheme allows members of a group to sign messages on behalf of the group without revealing their individual identities. However, in the case of a dispute, a designated group manager can revoke a user's anonymity and trace the signature back to the original signer.
+This repository provides a C++ implementation of the group signature scheme proposed by Boneh, Boyen, and Shacham in their paper [Short Group Signatures](https://crypto.stanford.edu/~dabo/pubs/papers/groupsigs.pdf). The scheme allows members of a group to sign messages on behalf of the group without revealing their individual identities. However, in the case of a dispute, a designated group manager can revoke a user's anonymity and trace the signature back to the original signer.
 
 This implementation is built upon the high-performance [mcl](https://github.com/herumi/mcl) pairing-based cryptography library and is designed to be both secure and efficient.
 

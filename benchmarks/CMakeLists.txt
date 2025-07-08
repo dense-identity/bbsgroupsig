@@ -8,4 +8,4 @@ target_include_directories(run_bbsgs_benchmarks PRIVATE "${CMAKE_CURRENT_SOURCE_
 # -----------------------------------------------------------------------------
 # Link Libraries
 # -----------------------------------------------------------------------------
-target_link_libraries(run_bbsgs_benchmarks PRIVATE bbsgs)
+target_link_libraries(run_bbsgs_benchmarks PRIVATE bbsgs mcl)

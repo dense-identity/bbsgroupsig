@@ -1,6 +1,11 @@
 # CMake minimum version required
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+# Force MCL to compile with no .param file and only static linkage
+set(MCL_USE_PARAM_FILE   OFF CACHE BOOL "" FORCE)
+set(MCL_BUILD_SHARED     OFF CACHE BOOL "" FORCE)
+set(MCL_BUILD_STATIC     ON  CACHE BOOL "" FORCE)
+
 # -----------------------------------------------------------------------------
 # Project Definition
 # -----------------------------------------------------------------------------
@@ -32,10 +37,18 @@ message(STATUS "BUILD_BBSGS_BENCHMARK: ${BUILD_BBSGS_BENCHMARK}")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 
-# -----------------------------
+# -----------------------------------------------------------------------------
 # Dependencies
-# -----------------------------
+# -----------------------------------------------------------------------------
 include(FetchContent)
+
+# Declare and fetch the MCL dependency automatically
+FetchContent_Declare(
+  mcl
+  GIT_REPOSITORY https://github.com/herumi/mcl.git
+  GIT_TAG        v3.00 # Using a specific tag for reproducibility
+)
+FetchContent_MakeAvailable(mcl)
 
 # -----------------------------------------------------------------------------
 # Subdirectory Processing
@@ -48,19 +61,19 @@ if(BUILD_BBSGS_TESTING)
 endif()
 
 if(BUILD_BBSGS_BENCHMARK)
-	add_subdirectory(benchmarks)
+  add_subdirectory(benchmarks)
 endif()
 
 # -----------------------------------------------------------------------------
 # Installation Rules (all libraries in one shot)
 # -----------------------------------------------------------------------------
 install(TARGETS
-	ecgroup            # shim library
-    bbsgs              # core library
-    bbsgs_c_interface  # shared C wrapper
-  	ARCHIVE  DESTINATION lib
-  	LIBRARY  DESTINATION lib
-  	RUNTIME  DESTINATION bin
+  ecgroup            # shim library
+  bbsgs              # core library
+  bbsgs_c_interface  # shared C wrapper
+  ARCHIVE  DESTINATION lib
+  LIBRARY  DESTINATION lib
+  RUNTIME  DESTINATION bin
 )
 
  # Install the public header files.

@@ -36,12 +36,12 @@ Before installing the Go bindings, ensure you have the following tools installed
    ```
 
 2. **Build and install** the library and headers:
-    Run the `runbuild.sh` script to build and install the C library:
+    Run the script located in `bindings/install.sh` script to build and install the C library:
     ```bash
-    ./runbuild.sh
+    ./bindings/install.sh
     ```
 
-   By default, this installs to `/usr/local`. To change the install location, pass `-DCMAKE_INSTALL_PREFIX=/your/path` to the `cmake` command in `runbuild.sh`.
+   By default, this installs to `/usr/local`. To change the install location, pass `-DCMAKE_INSTALL_PREFIX=/your/path` to the `cmake` command in `install.sh`.
 
 4. **Verify** the pkg-config file is available:
 

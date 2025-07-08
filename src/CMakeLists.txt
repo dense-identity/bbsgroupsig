@@ -12,7 +12,7 @@ target_include_directories(ecgroup
         $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(ecgroup PRIVATE mcl)
+target_link_libraries(ecgroup PUBLIC mcl)
 
 # -----------------------------------------------------------------------------
 # Main C++ Library (bbsgs)
@@ -30,7 +30,7 @@ target_include_directories(bbsgs
         $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(bbsgs PRIVATE ecgroup)
+target_link_libraries(bbsgs PUBLIC ecgroup)
 
 # -----------------------------------------------------------------------------
 # C Wrapper Library for Go Binding
@@ -52,4 +52,4 @@ target_include_directories(bbsgs_c_interface
 
 # Link the C wrapper against the main C++ library (bbsgs).
 # CMake will automatically handle the transitive dependencies (ecgroup, mcl).
-target_link_libraries(bbsgs_c_interface PRIVATE bbsgs)
+target_link_libraries(bbsgs_c_interface PUBLIC bbsgs)

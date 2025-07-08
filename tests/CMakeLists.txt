@@ -19,4 +19,4 @@ target_include_directories(run_bbsgs_tests PRIVATE "${PROJECT_SOURCE_DIR}/src")
 # -----------------------------------------------------------------------------
 # Link Libraries
 # -----------------------------------------------------------------------------
-target_link_libraries(run_bbsgs_tests PRIVATE bbsgs Catch2::Catch2WithMain)
+target_link_libraries(run_bbsgs_tests PRIVATE bbsgs Catch2::Catch2WithMain mcl)
