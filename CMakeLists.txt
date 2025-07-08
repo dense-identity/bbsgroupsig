@@ -28,6 +28,10 @@ option(BUILD_BBSGS_BENCHMARK "Build the benchmarks" ON)
 message(STATUS "BUILD_BBSGS_TESTING: ${BUILD_BBSGS_TESTING}")
 message(STATUS "BUILD_BBSGS_BENCHMARK: ${BUILD_BBSGS_BENCHMARK}")
 
+# Make all targets (static and shared) position‐independent by default
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+
 # -----------------------------
 # Dependencies
 # -----------------------------
@@ -48,38 +52,28 @@ if(BUILD_BBSGS_BENCHMARK)
 endif()
 
 # -----------------------------------------------------------------------------
-# Installation Rules
+# Installation Rules (all libraries in one shot)
 # -----------------------------------------------------------------------------
-install(TARGETS bbsgs
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
-
-# Install the ecgroup shim
-install(TARGETS ecgroup
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
-
-# Install the C wrapper interface
-install(TARGETS bbsgs_c_interface
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
-
-
-# Install the public header files.
-install(DIRECTORY include/
-        DESTINATION include)
-
-
-# Install pkg-config file
-configure_file(
-  ${CMAKE_SOURCE_DIR}/bbsgs.pc.in
-  ${CMAKE_BINARY_DIR}/bbsgs.pc
-  @ONLY
+install(TARGETS
+	ecgroup            # shim library
+    bbsgs              # core library
+    bbsgs_c_interface  # shared C wrapper
+  	ARCHIVE  DESTINATION lib
+  	LIBRARY  DESTINATION lib
+  	RUNTIME  DESTINATION bin
 )
-install(
-  FILES ${CMAKE_BINARY_DIR}/bbsgs.pc
-  DESTINATION lib/pkgconfig
-)
+
+ # Install the public header files.
+ install(DIRECTORY include/
+         DESTINATION include)
+
+ # Install pkg-config file
+ configure_file(
+   ${CMAKE_SOURCE_DIR}/bbsgs.pc.in
+   ${CMAKE_BINARY_DIR}/bbsgs.pc
+   @ONLY
+ )
+ install(
+   FILES ${CMAKE_BINARY_DIR}/bbsgs.pc
+   DESTINATION lib/pkgconfig
+ )
