@@ -55,6 +55,31 @@ install(TARGETS bbsgs
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
 
+# Install the ecgroup shim
+install(TARGETS ecgroup
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+
+# Install the C wrapper interface
+install(TARGETS bbsgs_c_interface
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+
+
 # Install the public header files.
 install(DIRECTORY include/
         DESTINATION include)
+
+
+# Install pkg-config file
+configure_file(
+  ${CMAKE_SOURCE_DIR}/bbsgs.pc.in
+  ${CMAKE_BINARY_DIR}/bbsgs.pc
+  @ONLY
+)
+install(
+  FILES ${CMAKE_BINARY_DIR}/bbsgs.pc
+  DESTINATION lib/pkgconfig
+)

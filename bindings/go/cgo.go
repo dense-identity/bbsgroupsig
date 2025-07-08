@@ -1,9 +1,7 @@
-// cgo.go
 package bbsgs
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../../include
-#cgo LDFLAGS: -L${SRCDIR}/../../build/src -lbbsgs_c_interface -lbbsgs -lecgroup -lmcl -lstdc++
+#cgo pkg-config: bbsgs
 #include "bbsgs/bbsgs_c.h"
 #include <stdlib.h>
 */
