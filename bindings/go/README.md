@@ -24,8 +24,7 @@ Before installing the Go bindings, ensure you have the following tools installed
 * **CMake** (version ≥ 3.15)
 * **pkg-config**
 * A C/C++ compiler toolchain (e.g., `gcc`/`g++` or `clang`)
-* **MCL** library and headers (pairing-friendly elliptic curve library)
-* Any other system libraries required by [bbsgs](../../src)
+* **MCL** library and headers (pairing-friendly elliptic curve library). See [MCL repository](https://github.com/herumi/mcl)
 
 ## Building & Installing the C Library
 
@@ -36,20 +35,13 @@ Before installing the Go bindings, ensure you have the following tools installed
    cd bbsgroupsig
    ```
 
-2. **Create a build directory** and run CMake:
+2. **Build and install** the library and headers:
+    Run the `runbuild.sh` script to build and install the C library:
+    ```bash
+    ./runbuild.sh
+    ```
 
-   ```bash
-   mkdir build && cd build
-   cmake -DCMAKE_BUILD_TYPE=Release ..
-   ```
-
-3. **Build and install** the library and headers:
-
-   ```bash
-   cmake --build . --target install
-   ```
-
-   By default, this installs to `/usr/local`. To change the install location, pass `-DCMAKE_INSTALL_PREFIX=/your/path` to the `cmake` command in step 2. Use ```sudo``` if installing to system directories failed.
+   By default, this installs to `/usr/local`. To change the install location, pass `-DCMAKE_INSTALL_PREFIX=/your/path` to the `cmake` command in `runbuild.sh`.
 
 4. **Verify** the pkg-config file is available:
 
@@ -90,7 +82,7 @@ package main
 
 import (
     "fmt"
-    "github.com/dense-identity/bbsgroupsig/bindings/go/bbsgs"
+    "github.com/dense-identity/bbsgroupsig/bindings/go"
 )
 
 func main() {
@@ -135,6 +127,3 @@ func main() {
 * **Cannot find libraries**: confirm that `bbsgs.pc` is in your `PKG_CONFIG_PATH` and libraries are under the matching `libdir`.
 * **cgo errors**: run `go env CGO_ENABLED` and ensure it prints `1`.
 
-## License
-
-This binding code is licensed under the Apache‑2.0 License. See [LICENSE](../../LICENSE) for details.
