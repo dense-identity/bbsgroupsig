@@ -46,9 +46,11 @@ You should have the following dependencies installed to build and run this libra
 * A C++17 compliant compiler (e.g., GCC, Clang)
 * [CMake](https://cmake.org/) (version 3.10 or later)
 * [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/): Required for building language bindings.
-* [MCL Library](https://github.com/herumi/mcl): A library for pairing-based cryptography.
 
-We also use [Catch2](https://github.com/catchorg/Catch2) for unit testing but it is automatically installed via CMake's `FetchContent` module.
+
+The following dependencies are fetched and built automatically by CMake and do not require manual installation:
+* **MCL Library**
+* **Catch2** (for testing)
 
 
 ## How to Build and Run
