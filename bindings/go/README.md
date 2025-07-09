@@ -41,7 +41,7 @@ Before installing the Go bindings, ensure you have the following tools installed
     ./bindings/install.sh
     ```
 
-   By default, this installs to `/usr/local`. To change the install location, pass `-DCMAKE_INSTALL_PREFIX=/your/path` to the `cmake` command in `install.sh`.
+   By default, this installs to `/usr/`. To change the install location, pass `-DCMAKE_INSTALL_PREFIX=/your/path` to the `cmake` command in `install.sh`.
 
 4. **Verify** the pkg-config file is available:
 
@@ -49,7 +49,7 @@ Before installing the Go bindings, ensure you have the following tools installed
    pkg-config --modversion bbsgs
    ```
 
-   You should see the version number (e.g., `1.0.0`). If not, ensure `PKG_CONFIG_PATH` includes the directory where `bbsgs.pc` was installed (e.g., `/usr/local/lib/pkgconfig`).
+   You should see the version number (e.g., `1.0.0`). If not, ensure `PKG_CONFIG_PATH` includes the directory where `bbsgs.pc` was installed (e.g., `/usr/lib/pkgconfig`).
 
 ## Running Tests and Benchmarks
 
