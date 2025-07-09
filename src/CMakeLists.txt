@@ -40,12 +40,12 @@ target_link_libraries(bbsgs PUBLIC ecgroup)
 # C Wrapper Library for Go Binding
 # -----------------------------------------------------------------------------
 # This target creates a static library specifically for the C API.
-add_library(bbsgs_c_interface SHARED
+add_library(bbsgs_c_interface STATIC
     bbsgs_c.cpp
 )
-set_target_properties(bbsgs_c_interface PROPERTIES
-  INSTALL_RPATH "$ORIGIN/../lib"
-)
+# set_target_properties(bbsgs_c_interface PROPERTIES
+#   INSTALL_RPATH "$ORIGIN/../lib"
+# )
 
 
 # The C wrapper needs to find the public headers.

@@ -1,7 +1,7 @@
 package bbsgs
 
 /*
-#cgo pkg-config: bbsgs
+#cgo pkg-config: --static bbsgs
 #include "bbsgs/bbsgs_c.h"
 #include <stdlib.h>
 */
