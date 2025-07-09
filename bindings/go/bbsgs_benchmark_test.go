@@ -92,3 +92,21 @@ func BenchmarkOpen(b *testing.B) {
         }
     }
 }
+
+func BenchmarkVerifyUsk(b *testing.B) {
+    gpk, _, isk, err := Setup()
+    if err != nil {
+        b.Fatalf("Setup failed: %v", err)
+    }
+    usk, err := UserKeygen(gpk, isk)
+    if err != nil {
+        b.Fatalf("UserKeygen failed: %v", err)
+    }
+
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        if !VerifyUsk(gpk, usk) {
+            b.Fatal("VerifyUsk returned false")
+        }
+    }
+}

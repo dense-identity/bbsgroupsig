@@ -33,6 +33,12 @@ int bbs04_sign_c(
     unsigned char** sig_out, size_t* sig_len_out
 );
 
+// Check if generated user secret key is valid for group parameters
+int bbs04_verify_usk_c(
+    const unsigned char* gpk_in, size_t gpk_len_in,
+    const unsigned char* usk_in, size_t usk_len_in
+);
+
 // Verify checks if a signature is valid. Returns 1 for valid, 0 for invalid.
 int bbs04_verify_c(
     const unsigned char* gpk_in, size_t gpk_len_in,

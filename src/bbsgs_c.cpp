@@ -82,6 +82,19 @@ int bbs04_sign_c(
     }
 }
 
+int bbs04_verify_usk_c(
+    const unsigned char* gpk_in, size_t gpk_len_in,
+    const unsigned char* usk_in, size_t usk_len_in)
+{
+    ecgroup::Bytes gpk_bytes(gpk_in, gpk_in + gpk_len_in);
+    ecgroup::Bytes usk_bytes(usk_in, usk_in + usk_len_in);
+
+    bbsgs::GroupPublicKey gpk = bbsgs::GroupPublicKey::from_bytes(gpk_bytes);
+    bbsgs::UserSecretKey usk = bbsgs::UserSecretKey::from_bytes(usk_bytes);
+
+    return bbsgs::bbs04_verify_usk(gpk, usk) ? 1 : 0;
+}
+
 int bbs04_verify_c(
     const unsigned char* gpk_in, size_t gpk_len_in,
     const unsigned char* sig_in, size_t sig_len_in,

@@ -15,6 +15,10 @@ func TestBBS04EndToEnd(t *testing.T) {
         t.Fatalf("UserKeygen failed or returned empty: %v", err)
     }
 
+    if !VerifyUsk(gpk, usk) {
+        t.Fatal("VerifyUsk returned false")
+    }
+
     msg := []byte("hello")
     sig, err := Sign(gpk, usk, msg)
     if err != nil || len(sig) == 0 {

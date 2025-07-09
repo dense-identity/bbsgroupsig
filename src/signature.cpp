@@ -121,6 +121,14 @@ namespace bbsgs {
         return sigma.T3.add(h_pow_ab.negate());
     }
 
+    bool bbs04_verify_usk(const GroupPublicKey& gpk, const UserSecretKey& usk) {
+        ecgroup::G2Point w_g2x = gpk.w.add(ecgroup::G2Point::mul(gpk.g2, usk.x));
+        ecgroup::PairingResult e1 = ecgroup::pairing(usk.A, w_g2x);
+        ecgroup::PairingResult e2 = ecgroup::pairing(gpk.g1, gpk.g2);
+
+        return e1 == e2;
+    }
+
     Scalar hash_all_to_scalar(
         const ecgroup::Bytes& message,
         const ecgroup::G1Point& T1, const ecgroup::G1Point& T2, const ecgroup::G1Point& T3,

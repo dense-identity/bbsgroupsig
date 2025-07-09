@@ -2,7 +2,7 @@ package bbsgs
 
 /*
 #cgo pkg-config: --static bbsgs
-#include "bbsgs/bbsgs_c.h"
+#include <bbsgs/bbsgs_c.h>
 #include <stdlib.h>
 */
 import "C"
@@ -85,6 +85,15 @@ func Sign(gpk, usk, msg []byte) (sig []byte, err error) {
     defer C.free_byte_buffer(sigPtr)
     sig = C.GoBytes(unsafe.Pointer(sigPtr), C.int(sigLen))
     return
+}
+
+// Verify returns true if sig is a valid signature on msg under gpk.
+func VerifyUsk(gpk, usk []byte) bool {
+    ret := C.bbs04_verify_usk_c(
+        (*C.uchar)(unsafe.Pointer(&gpk[0])), C.size_t(len(gpk)),
+        (*C.uchar)(unsafe.Pointer(&usk[0])), C.size_t(len(usk)),
+    )
+    return ret == 1
 }
 
 // Verify returns true if sig is a valid signature on msg under gpk.

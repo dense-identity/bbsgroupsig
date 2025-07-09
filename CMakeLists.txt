@@ -10,7 +10,7 @@ set(MCL_BUILD_STATIC     ON  CACHE BOOL "" FORCE)
 # Project Definition
 # -----------------------------------------------------------------------------
 # Define the project name, version, and language
-project(bbsgs VERSION 1.0.0 LANGUAGES C CXX)
+project(bbsgs VERSION 1.0.5 LANGUAGES C CXX)
 
 # -----------------------------------------------------------------------------
 # C++ Standard Configuration

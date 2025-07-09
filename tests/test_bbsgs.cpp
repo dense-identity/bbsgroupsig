@@ -23,11 +23,8 @@ TEST_CASE("BBS04 Group Signature Scheme", "[bbsgs]") {
     SECTION("Generated User Key Validity") {
         // After key generation, it's critical to verify that the user's secret key
         // satisfies the fundamental group membership equation: e(A, w * g2^x) == e(g1, g2)
-        ecgroup::G2Point w_g2x = gpk.w.add(ecgroup::G2Point::mul(gpk.g2, usk.x));
-        ecgroup::PairingResult e1 = ecgroup::pairing(usk.A, w_g2x);
-        ecgroup::PairingResult e2 = ecgroup::pairing(gpk.g1, gpk.g2);
-
-        REQUIRE(e1 == e2);
+        bool is_valid = bbsgs::bbs04_verify_usk(gpk, usk);
+        REQUIRE(is_valid == true);
     }
 
     SECTION("Valid Signature and Verification") {

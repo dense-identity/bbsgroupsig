@@ -10,6 +10,7 @@ namespace bbsgs {
     GroupSignature bbs04_sign(GroupPublicKey const &gpk, UserSecretKey const &usk, ecgroup::Bytes const &message);
     bool bbs04_verify(GroupPublicKey const &gpk, ecgroup::Bytes const &message, GroupSignature const &sigma);
     ecgroup::G1Point bbs04_open(const GroupPublicKey& gpk, const OpenerSecretKey& osk, const GroupSignature& sigma);
+    bool bbs04_verify_usk(const GroupPublicKey& gpk, const UserSecretKey& usk);
 
     Scalar hash_all_to_scalar(
         const Bytes& message,
