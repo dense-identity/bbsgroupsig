@@ -1,7 +1,7 @@
 #ifndef SHIM_ECGROUP_HPP
 #define SHIM_ECGROUP_HPP
 
-#include <mcl/bn256.hpp>
+#include <mcl/bn.hpp>
 #include <vector>
 #include <string>
 

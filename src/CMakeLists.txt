@@ -6,6 +6,9 @@ add_library(ecgroup
     keys.cpp
 )
 
+message(STATUS "MCL headers will be pulled from: ${mcl_SOURCE_DIR}/include")
+message(STATUS "FetchContent binary dir is: ${CMAKE_BINARY_DIR}/_deps/mcl-src")
+
 target_include_directories(ecgroup
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
