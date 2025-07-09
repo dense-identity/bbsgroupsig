@@ -50,6 +50,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(mcl)
 
+include_directories(${mcl_SOURCE_DIR}/include)
+
 # -----------------------------------------------------------------------------
 # Subdirectory Processing
 # -----------------------------------------------------------------------------
