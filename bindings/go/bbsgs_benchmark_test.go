@@ -6,7 +6,6 @@ import (
 
 func BenchmarkSetup(b *testing.B) {
     for i := 0; i < b.N; i++ {
-        // each iteration, run full setup
         _, _, _, err := Setup()
         if err != nil {
             b.Fatalf("Setup failed: %v", err)
@@ -107,6 +106,62 @@ func BenchmarkVerifyUsk(b *testing.B) {
     for i := 0; i < b.N; i++ {
         if !VerifyUsk(gpk, usk) {
             b.Fatal("VerifyUsk returned false")
+        }
+    }
+}
+
+// EC helper benchmarks
+func BenchmarkScalarRandom(b *testing.B) {
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        _, err := ScalarRandom()
+        if err != nil {
+            b.Fatalf("ScalarRandom failed: %v", err)
+        }
+    }
+}
+
+func BenchmarkScalarInverse(b *testing.B) {
+    // generate one scalar
+    scalar, err := ScalarRandom()
+    if err != nil {
+        b.Fatalf("ScalarRandom failed: %v", err)
+    }
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        _, err := ScalarInverse(scalar)
+        if err != nil {
+            b.Fatalf("ScalarInverse failed: %v", err)
+        }
+    }
+}
+
+func BenchmarkG1HashToPoint(b *testing.B) {
+    msg := []byte("benchmark message")
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        _, err := G1HashToPoint(msg)
+        if err != nil {
+            b.Fatalf("G1HashToPoint failed: %v", err)
+        }
+    }
+}
+
+func BenchmarkG1Mul(b *testing.B) {
+    msg := []byte("benchmark message")
+    scalar, err := ScalarRandom()
+    if err != nil {
+        b.Fatalf("ScalarRandom failed: %v", err)
+    }
+    point, err := G1HashToPoint(msg)
+    if err != nil {
+        b.Fatalf("G1HashToPoint failed: %v", err)
+    }
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        _, err := G1Mul(point, scalar)
+        if err != nil {
+            b.Fatalf("G1Mul failed: %v", err)
         }
     }
 }
