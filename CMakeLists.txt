@@ -29,9 +29,11 @@ message(STATUS "Building bbsgs Version: ${PROJECT_VERSION}")
 # -----------------------------------------------------------------------------
 option(BUILD_BBSGS_TESTING "Build the tests" ON)
 option(BUILD_BBSGS_BENCHMARK "Build the benchmarks" ON)
+option(BUILD_BBSGS_ANDROID "Build for Android" OFF)
 
 message(STATUS "BUILD_BBSGS_TESTING: ${BUILD_BBSGS_TESTING}")
 message(STATUS "BUILD_BBSGS_BENCHMARK: ${BUILD_BBSGS_BENCHMARK}")
+message(STATUS "BUILD_BBSGS_ANDROID: ${BUILD_BBSGS_ANDROID}")
 
 # Make all targets (static and shared) position‐independent by default
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
