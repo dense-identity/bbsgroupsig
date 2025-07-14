@@ -52,7 +52,7 @@ target_include_directories(bbsgs_c_interface
 
 target_link_libraries(bbsgs_c_interface PUBLIC bbsgs)
 
-if (BUILD_BBSGS_ANDROID)
+if (BUILD_BBSGS_JNI)
   # -----------------------------------------------------------------------------
   # JNI C++ Library (bbsgs_jni)
   # -----------------------------------------------------------------------------
