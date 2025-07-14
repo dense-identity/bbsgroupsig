@@ -46,7 +46,10 @@ You should have the following dependencies installed to build and run this libra
 * A C++17 compliant compiler (e.g., GCC, Clang)
 * [CMake](https://cmake.org/) (version 3.10 or later)
 * [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/): Required for building language bindings.
-
+* If building for android:
+    * JDK 11
+    * Android NDK
+    * GMP
 
 The following dependencies are fetched and built automatically by CMake and do not require manual installation:
 * **MCL Library**
