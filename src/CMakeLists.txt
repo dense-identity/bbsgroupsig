@@ -58,7 +58,7 @@ target_link_libraries(bbsgs_c_interface PUBLIC bbsgs)
 # -----------------------------------------------------------------------------
 find_package(JNI REQUIRED)
 if (JNI_FOUND)
-  message(STATUS "Found JNI: ${JNI_VERSION_STRING}")
+  message(STATUS "Found JNI: ${JNI_INCLUDE_DIRS}")
 else()
   message(FATAL_ERROR "JNI not found - please install a JDK or use the Android NDK toolchain")
 endif()
@@ -66,19 +66,24 @@ endif()
 # -----------------------------------------------------------------------------
 # JNI C++ Library (bbsgs_jni)
 # -----------------------------------------------------------------------------
+# This library should ONLY contain the JNI-specific implementation.
 add_library(bbsgs_jni SHARED
-  bbsgs_c.cpp
   bbsgs_jni.cpp
 )
 
 target_include_directories(bbsgs_jni
   PRIVATE
+    # The C header is in the project's include directory
     ${PROJECT_SOURCE_DIR}/include
+    # Headers for JNI itself
     ${JNI_INCLUDE_DIRS}
 )
 
+# Link against the C wrapper library, which in turn links against the core C++ lib.
+# This creates the correct dependency chain: bbsgs_jni -> bbsgs_c_interface -> bbsgs -> mcl
 target_link_libraries(bbsgs_jni
-  PRIVATE bbsgs
+  PRIVATE
+    bbsgs_c_interface
 )
 
 set_target_properties(bbsgs_jni PROPERTIES
