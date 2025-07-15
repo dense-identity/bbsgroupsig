@@ -1,6 +1,6 @@
-rm -rf bbuild
-mkdir -p bbuild && cd bbuild
+rm -rf buildb
+mkdir -p buildb && cd buildb
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
 sudo cmake --build . --target install
 sudo ldconfig
-rm -rf bbuild
+rm -rf buildb
