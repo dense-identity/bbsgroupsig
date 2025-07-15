@@ -21,15 +21,15 @@ static jbyteArray toJavaByteArray(JNIEnv* env,
 
 extern "C" {
 
-// void bbs04_init_pairing()
+// Kotlin: external fun bbs04InitPairing()
 JNIEXPORT void JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1init_1pairing(JNIEnv* env, jclass) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_bbs04InitPairing(JNIEnv* env, jclass) {
     bbs04_init_pairing();
 }
 
-// SetupResult bbs04_setup()
+// Kotlin: external fun bbs04Setup(): SetupResult
 JNIEXPORT jobject JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1setup(JNIEnv* env, jclass) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_bbs04Setup(JNIEnv* env, jclass) {
     unsigned char *gpk = nullptr, *osk = nullptr, *isk = nullptr;
     size_t gpk_len=0, osk_len=0, isk_len=0;
 
@@ -42,17 +42,16 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1setup(JNIEnv* env, jclass
     jbyteArray josk = toJavaByteArray(env, osk, osk_len);
     jbyteArray jisk = toJavaByteArray(env, isk, isk_len);
 
-    // Construct io.github.denseidentity.bbsgroupsig.BBSSGS.SetupResult(byte[],byte[],byte[])
-    jclass cls = env->FindClass("io/github/denseidentity/bbsgroupsig/BBSSGS$SetupResult");
+    jclass cls = env->FindClass("io/github/denseidentity/bbsgroupsig/BBSGS$SetupResult");
     jmethodID ctor = env->GetMethodID(cls, "<init>", "([B[B[B)V");
     return env->NewObject(cls, ctor, jgpk, josk, jisk);
 }
 
-// byte[] bbs04_user_keygen(byte[] gpk, byte[] isk)
+// Kotlin: external fun bbs04UserKeygen(gpk: ByteArray, isk: ByteArray): ByteArray
 JNIEXPORT jbyteArray JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1user_1keygen(JNIEnv* env, jclass,
-                                                                    jbyteArray jgpk,
-                                                                    jbyteArray jisk) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_bbs04UserKeygen(JNIEnv* env, jclass,
+                                                              jbyteArray jgpk,
+                                                              jbyteArray jisk) {
     jsize gpk_len = env->GetArrayLength(jgpk);
     std::vector<unsigned char> gpk_buf(gpk_len);
     env->GetByteArrayRegion(jgpk, 0, gpk_len, reinterpret_cast<jbyte*>(gpk_buf.data()));
@@ -72,12 +71,12 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1user_1keygen(JNIEnv* env,
     return toJavaByteArray(env, usk, usk_len);
 }
 
-// byte[] bbs04_sign(byte[] gpk, byte[] usk, byte[] msg)
+// Kotlin: external fun bbs04Sign(gpk: ByteArray, usk: ByteArray, msg: ByteArray): ByteArray
 JNIEXPORT jbyteArray JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1sign(JNIEnv* env, jclass,
-                                                            jbyteArray jgpk,
-                                                            jbyteArray jusk,
-                                                            jbyteArray jmsg) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_bbs04Sign(JNIEnv* env, jclass,
+                                                         jbyteArray jgpk,
+                                                         jbyteArray jusk,
+                                                         jbyteArray jmsg) {
     jsize gpk_len = env->GetArrayLength(jgpk);
     std::vector<unsigned char> gpk_buf(gpk_len);
     env->GetByteArrayRegion(jgpk, 0, gpk_len, reinterpret_cast<jbyte*>(gpk_buf.data()));
@@ -102,11 +101,11 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1sign(JNIEnv* env, jclass,
     return toJavaByteArray(env, sig, sig_len);
 }
 
-// boolean bbs04_verify_usk(byte[] gpk, byte[] usk)
+// Kotlin: external fun bbs04VerifyUsk(gpk: ByteArray, usk: ByteArray): Boolean
 JNIEXPORT jboolean JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1verify_1usk(JNIEnv* env, jclass,
-                                                                   jbyteArray jgpk,
-                                                                   jbyteArray jusk) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_bbs04VerifyUsk(JNIEnv* env, jclass,
+                                                             jbyteArray jgpk,
+                                                             jbyteArray jusk) {
     jsize gpk_len = env->GetArrayLength(jgpk);
     std::vector<unsigned char> gpk_buf(gpk_len);
     env->GetByteArrayRegion(jgpk, 0, gpk_len, reinterpret_cast<jbyte*>(gpk_buf.data()));
@@ -120,12 +119,12 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1verify_1usk(JNIEnv* env, 
     return (ok == 1) ? JNI_TRUE : JNI_FALSE;
 }
 
-// boolean bbs04_verify(byte[] gpk, byte[] sig, byte[] msg)
+// Kotlin: external fun bbs04Verify(gpk: ByteArray, sig: ByteArray, msg: ByteArray): Boolean
 JNIEXPORT jboolean JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1verify(JNIEnv* env, jclass,
-                                                              jbyteArray jgpk,
-                                                              jbyteArray jsig,
-                                                              jbyteArray jmsg) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_bbs04Verify(JNIEnv* env, jclass,
+                                                           jbyteArray jgpk,
+                                                           jbyteArray jsig,
+                                                           jbyteArray jmsg) {
     jsize gpk_len = env->GetArrayLength(jgpk);
     std::vector<unsigned char> gpk_buf(gpk_len);
     env->GetByteArrayRegion(jgpk, 0, gpk_len, reinterpret_cast<jbyte*>(gpk_buf.data()));
@@ -144,12 +143,12 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1verify(JNIEnv* env, jclas
     return (ok == 1) ? JNI_TRUE : JNI_FALSE;
 }
 
-// byte[] bbs04_open(byte[] gpk, byte[] osk, byte[] sig)
+// Kotlin: external fun bbs04Open(gpk: ByteArray, osk: ByteArray, sig: ByteArray): ByteArray
 JNIEXPORT jbyteArray JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1open(JNIEnv* env, jclass,
-                                                            jbyteArray jgpk,
-                                                            jbyteArray josk,
-                                                            jbyteArray jsig) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_bbs04Open(JNIEnv* env, jclass,
+                                                         jbyteArray jgpk,
+                                                         jbyteArray josk,
+                                                         jbyteArray jsig) {
     jsize gpk_len = env->GetArrayLength(jgpk);
     std::vector<unsigned char> gpk_buf(gpk_len);
     env->GetByteArrayRegion(jgpk, 0, gpk_len, reinterpret_cast<jbyte*>(gpk_buf.data()));
@@ -174,9 +173,9 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_bbs04_1open(JNIEnv* env, jclass,
     return toJavaByteArray(env, cred, cred_len);
 }
 
-// byte[] ecScalarRandom()
+// Kotlin: external fun ecScalarRandom(): ByteArray
 JNIEXPORT jbyteArray JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_ecScalarRandom(JNIEnv* env, jclass) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_ecScalarRandom(JNIEnv* env, jclass) {
     unsigned char* buf = nullptr;
     size_t len = 0;
     if (ec_scalar_random(&buf, &len) != BBSGS_OK) {
@@ -186,10 +185,10 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_ecScalarRandom(JNIEnv* env, jcla
     return toJavaByteArray(env, buf, len);
 }
 
-// byte[] ecScalarInverse(byte[] scalar)
+// Kotlin: external fun ecScalarInverse(scalar: ByteArray): ByteArray
 JNIEXPORT jbyteArray JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_ecScalarInverse(JNIEnv* env, jclass,
-                                                                 jbyteArray jscalar) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_ecScalarInverse(JNIEnv* env, jclass,
+                                                               jbyteArray jscalar) {
     jsize slen = env->GetArrayLength(jscalar);
     std::vector<unsigned char> s_buf(slen);
     env->GetByteArrayRegion(jscalar, 0, slen, reinterpret_cast<jbyte*>(s_buf.data()));
@@ -203,10 +202,10 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_ecScalarInverse(JNIEnv* env, jcl
     return toJavaByteArray(env, inv, inv_len);
 }
 
-// byte[] ecG1HashToPoint(byte[] msg)
+// Kotlin: external fun ecG1HashToPoint(msg: ByteArray): ByteArray
 JNIEXPORT jbyteArray JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_ecG1HashToPoint(JNIEnv* env, jclass,
-                                                                 jbyteArray jmsg) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_ecG1HashToPoint(JNIEnv* env, jclass,
+                                                               jbyteArray jmsg) {
     jsize mlen = env->GetArrayLength(jmsg);
     std::vector<unsigned char> m_buf(mlen);
     env->GetByteArrayRegion(jmsg, 0, mlen, reinterpret_cast<jbyte*>(m_buf.data()));
@@ -220,11 +219,11 @@ Java_io_github_denseidentity_bbsgroupsig_BBSSGS_ecG1HashToPoint(JNIEnv* env, jcl
     return toJavaByteArray(env, pt, pt_len);
 }
 
-// byte[] ecG1Mul(byte[] point, byte[] scalar)
+// Kotlin: external fun ecG1Mul(point: ByteArray, scalar: ByteArray): ByteArray
 JNIEXPORT jbyteArray JNICALL
-Java_io_github_denseidentity_bbsgroupsig_BBSSGS_ecG1Mul(JNIEnv* env, jclass,
-                                                        jbyteArray jpoint,
-                                                        jbyteArray jscalar) {
+Java_io_github_denseidentity_bbsgroupsig_BBSGS_ecG1Mul(JNIEnv* env, jclass,
+                                                       jbyteArray jpoint,
+                                                       jbyteArray jscalar) {
     jsize plen = env->GetArrayLength(jpoint);
     std::vector<unsigned char> p_buf(plen);
     env->GetByteArrayRegion(jpoint, 0, plen, reinterpret_cast<jbyte*>(p_buf.data()));
