@@ -49,7 +49,7 @@ set(MCL_GIT_REPO  "https://github.com/herumi/mcl.git")
 set(MCL_GIT_TAG   "v3.00")
 
 # When cross-compiling for Android (or ANDROID is defined), switch to your fork:
-if(ANDROID)
+if(CMAKE_CROSSCOMPILING OR ANDROID)
   message(STATUS "Android build detected → using forked MCL with Android patch")
   set(MCL_GIT_REPO  "https://github.com/lokingdav/mcl-patch.git")
   set(MCL_GIT_TAG   "master")    # or whatever tag/branch you pushed
