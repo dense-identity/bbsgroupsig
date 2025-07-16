@@ -1,5 +1,5 @@
 # CMake minimum version required
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 
 # Force MCL to compile with no .param file and only static linkage
 set(MCL_USE_PARAM_FILE   OFF CACHE BOOL "" FORCE)
@@ -52,8 +52,10 @@ set(MCL_GIT_TAG   "v3.00")
 if(CMAKE_CROSSCOMPILING OR ANDROID)
   message(STATUS "Android build detected → using forked MCL with Android patch")
   set(MCL_GIT_REPO  "https://github.com/lokingdav/mcl-patch.git")
-  set(MCL_GIT_TAG   "master")    # or whatever tag/branch you pushed
+  set(MCL_GIT_TAG   "ba95939")    # or whatever tag/branch you pushed
 endif()
+
+message("MCL will be cloned from URL=${MCL_GIT_REPO},  TAG=${MCL_GIT_TAG}")
 
 # Declare and fetch the MCL dependency automatically
 FetchContent_Declare(
