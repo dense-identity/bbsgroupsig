@@ -44,11 +44,22 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # -----------------------------------------------------------------------------
 include(FetchContent)
 
+# Decide which MCL to fetch:
+set(MCL_GIT_REPO  "https://github.com/herumi/mcl.git")
+set(MCL_GIT_TAG   "v3.00")
+
+# When cross-compiling for Android (or ANDROID is defined), switch to your fork:
+if(ANDROID)
+  message(STATUS "Android build detected → using forked MCL with Android patch")
+  set(MCL_GIT_REPO  "https://github.com/lokingdav/mcl-patch.git")
+  set(MCL_GIT_TAG   "master")    # or whatever tag/branch you pushed
+endif()
+
 # Declare and fetch the MCL dependency automatically
 FetchContent_Declare(
   mcl
-  GIT_REPOSITORY https://github.com/herumi/mcl.git
-  GIT_TAG        v3.00 # Using a specific tag for reproducibility
+  GIT_REPOSITORY ${MCL_GIT_REPO}
+  GIT_TAG        ${MCL_GIT_TAG}
 )
 FetchContent_MakeAvailable(mcl)
 
